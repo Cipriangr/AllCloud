@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { BackendService } from '../backend.service';
+import { ContactType } from '../interfaces';
 
 @Component({
   selector: 'app-users-list',
@@ -8,14 +9,14 @@ import { BackendService } from '../backend.service';
 })
 export class UsersListComponent {
 
-  users: any[] = [];
+  contacts: ContactType[] = [];
 
-  constructor(private backend: BackendService) {}
+  constructor(private backend: BackendService) { }
 
   ngOnInit(): void {
     this.backend.getUsers().subscribe(data => {
-      console.log('test', data);
-      this.users = data
+      console.log('!!data', data);
+      this.contacts = data;
     })
   }
 

@@ -15,7 +15,7 @@ export class ContactListComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    console.log('test', this.contactList);
+    console.log('!!contactlist', this.contactList);
   }
 
   addNewContact() {

@@ -19,7 +19,7 @@ export class BackendService {
     this.httpClient.get<any>('https://randomuser.me/api').subscribe(
       data => {
         newContact = data.results[0];
-        console.log('!!data', newContact);
+        console.log('!!newContact', newContact);
       }
     )
     return newContact;
