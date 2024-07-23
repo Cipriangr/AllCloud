@@ -1,0 +1,28 @@
+@import '../../../styles.scss';
+
+.action-buttons {
+  display: flex;
+  justify-content: flex-end;
+  margin: 0 20px 10px 0;
+
+  button {
+    background-color: transparent;
+    border: 2px solid $light-blue;
+    padding: 5px 10px;
+    border-radius: 10px;
+    font-weight: 700;
+    color: $blue;
+    font-size: 16px;
+    transition: all 0.25s ease-in-out;
+
+    &:nth-child(1) {
+      margin-right: 10px;
+    }
+
+    &:hover {
+      cursor: pointer;
+      background-color: $light-blue;
+      color: white;
+    }
+  }
+}
