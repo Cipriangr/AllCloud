@@ -1,6 +1,6 @@
 <div class="action-buttons">
-  <button>Add New Contact</button>
-  <button (click)="addNewContact()">
+  <button [routerLink]="['/new-contact']">Add New Contact</button>
+  <button (click)="addRandomContact()">
     Add Random Records
   </button>
 </div>

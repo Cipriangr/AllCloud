@@ -1,0 +1,82 @@
+<div class="new-contact-form">
+  <h1>New Contact Form</h1>
+  <form [formGroup]="contactFormGroup" (ngSubmit)="submitForm($event)">
+    <div class="form-group">
+      <label for="first">First Name</label>
+      <div class="content">
+        <input type="text" formControlName="firstName">
+        <span class="required">
+          *
+        </span>
+      </div>
+      <span [hidden]="checkValidInput('firstName')">
+        Minimum length must be 3 characters and maximum 25
+      </span>
+    </div>
+    <div class="form-group">
+      <label for="last">Last Name</label>
+      <div class="content">
+        <input type="text" formControlName="lastName">
+        <span class="required">
+          *
+        </span>
+      </div>
+      <span [hidden]="checkValidInput('lastName')">
+        Minimum length must be 3 characters and maximum 25
+      </span>
+    </div>
+    <div class="form-group">
+      <label for="email">Email</label>
+      <div class="content">
+        <input type="email" formControlName="email">
+        <span class="required">
+          *
+        </span>
+      </div>
+      <span [hidden]="checkValidInput('email')">
+        Type a valid email
+      </span>
+    </div>
+    <div class="form-group">
+      <label for="age">Age</label>
+      <div class="content">
+        <input type="number" formControlName="age">
+        <span class="required">
+          *
+        </span>
+      </div>
+      <span [hidden]="checkValidInput('age')">
+        Type a valid age (5 - 99)
+      </span>
+    </div>
+    <div class="form-group">
+      <label for="phone">Phone number</label>
+      <div class="content">
+        <input type="tel" formControlName="phone">
+        <span class="required">
+          *
+        </span>
+      </div>
+      <span [hidden]="checkValidInput('phone')">
+        Phone number must have 10 digits
+      </span>
+    </div>
+    <div class="form-group">
+      <label for="gender">Gender</label>
+      <select name="gender">
+        <option value="Male">Male</option>
+        <option value="Female">Female</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="image">Upload an image (not handled yet)</label>
+      <input type="file" name="image" id="image-input">
+    </div>
+    <div *ngIf="errorForm" class="errorForm">
+      <h4>You need to complete all required inputs marked by: <span class="required">*</span>character</h4>
+    </div>
+    <div class="create-form">
+      <button type="submit" class="submit">Submit</button>
+    </div>
+  </form>
+</div>
