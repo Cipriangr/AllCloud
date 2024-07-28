@@ -6,6 +6,7 @@ import { ContactFormData, ContactsState, ContactType } from '../../interfaces';
 import { BackendService } from '../../backend.service';
 import { selectAllContacts } from '../../store/selectors/contacts.selectors';
 import { Observable } from 'rxjs';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-new-contact',
@@ -18,7 +19,8 @@ export class NewContactComponent implements OnInit {
   contact: ContactType[] = [];
   contacts$: Observable<ContactType[]>;
 
-  constructor(private store: Store<{contacts: ContactsState}>, private formBuilder: FormBuilder, private backendService: BackendService) {
+  constructor(private store: Store<{contacts: ContactsState}>, private formBuilder: FormBuilder, private backendService: BackendService,
+              private router: Router) {
     this.contacts$ = this.store.pipe(select(selectAllContacts));
   }
 
@@ -69,6 +71,7 @@ export class NewContactComponent implements OnInit {
     this.errorForm = false;
     const contactData = this.saveContactData(this.contactFormGroup.value);
     this.store.dispatch(updateContacts({contacts: [contactData]}))
-    this.contacts$.subscribe(contacts => console.log('Check contacts store', contacts));
+    // this.contacts$.subscribe(contacts => console.log('Check contacts store', contacts));
+    this.router.navigate(['/contact-list'])
   }
 }
