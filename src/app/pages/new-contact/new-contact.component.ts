@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { select, Store } from '@ngrx/store';
 import { loadContacts, updateContacts } from '../../store/actions/contacts.actions';
 import { ContactFormData, ContactsState, ContactType } from '../../interfaces';
@@ -17,11 +17,11 @@ export class NewContactComponent implements OnInit {
   contactFormGroup!: FormGroup;
   errorForm: boolean = false;
   contact: ContactType[] = [];
-  contacts$: Observable<ContactType[]>;
+  // contacts$: Observable<ContactType[]>;
 
   constructor(private store: Store<{contacts: ContactsState}>, private formBuilder: FormBuilder, private backendService: BackendService,
               private router: Router) {
-    this.contacts$ = this.store.pipe(select(selectAllContacts));
+    // this.contacts$ = this.store.pipe(select(selectAllContacts));
   }
 
   ngOnInit(): void {
@@ -31,10 +31,10 @@ export class NewContactComponent implements OnInit {
       email: [null, [Validators.required, Validators.email]],
       phone: [null, [Validators.required, Validators.pattern(/^[0-9]{10}$/)]],
       age: [null, [Validators.required, Validators.pattern(/^[1-9][0-9]{0,1}$/)]],
-      gender: ['Male', [Validators.required]],
-      image: [null]
+      image: [null],
+      gender: ['Male']
     });
-    this.store.dispatch(loadContacts());
+    // this.store.dispatch(loadContacts());
   }
 
   checkValidInput(ControlType: string): boolean {
@@ -54,11 +54,11 @@ export class NewContactComponent implements OnInit {
       firstName: contact.firstName,
       title: (contact.gender === 'Male' ? 'Mr' : 'Ms'),
       age: contact.age,
-      large: contact.image,
-      medium: contact.image,
-      thumbnail: contact.image,
+      large: contact.image || '',
+      medium: contact.image || '',
+      thumbnail: contact.image || '',
       gender: contact.gender,
-      phone: contact.phone
+      phone: contact.phone 
     };
   }
 
@@ -70,6 +70,7 @@ export class NewContactComponent implements OnInit {
     }
     this.errorForm = false;
     const contactData = this.saveContactData(this.contactFormGroup.value);
+    console.log('!!contactdata', contactData);
     this.store.dispatch(updateContacts({contacts: [contactData]}))
     // this.contacts$.subscribe(contacts => console.log('Check contacts store', contacts));
     this.router.navigate(['/contact-list'])

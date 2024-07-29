@@ -1,8 +1,16 @@
 <div class="action-buttons">
   <button [routerLink]="['/new-contact']">Add New Contact</button>
-  <button (click)="addRandomContact()">
+  <button (click)="addRandomContacts()" [disabled]="isButtonDisabled">
     Add Random Records
   </button>
 </div>
 <br>
+<div class="upload">
+  <span class="success" *ngIf="(succesUploadContact$ | async) as successMessage">
+    {{ successMessage }}
+  </span>
+  <span class="error" *ngIf="(failedUploadContact$ | async) as errorMessage">
+    {{ errorMessage }}
+  </span>
+</div>
 <app-users-list></app-users-list>

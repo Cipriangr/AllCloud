@@ -63,20 +63,20 @@
     </div>
     <div class="form-group">
       <label for="gender">Gender</label>
-      <select name="gender">
+      <select name="gender" formControlName="gender">
         <option value="Male">Male</option>
         <option value="Female">Female</option>
       </select>
     </div>
     <div class="form-group">
-      <label for="image">Upload an image (not handled yet)</label>
+      <label for="image">Upload an image (field not handled)</label>
       <input type="file" name="image" id="image-input">
     </div>
     <div *ngIf="errorForm" class="errorForm">
       <h4>You need to complete all required inputs marked by: <span class="required">*</span>character</h4>
     </div>
     <div class="create-form">
-      <button type="submit" class="submit">Submit</button>
+      <button type="submit" class="submit">Save Contact</button>
     </div>
   </form>
 </div>

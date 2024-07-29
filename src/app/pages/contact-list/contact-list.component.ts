@@ -1,30 +1,55 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { BackendService } from '../../backend.service';
 import { ContactType, FetchedContactType } from '../../interfaces';
-import { Store } from '@ngrx/store';
+import { select, Store } from '@ngrx/store';
 import { updateContacts } from '../../store/actions/contacts.actions';
+import { finalize, Observable, Subscription, switchMap, timer } from 'rxjs';
+import { selectUpdateContactsError, selectUpdateContactsSuccess } from '../../store/selectors/contacts.selectors';
 
 @Component({
   selector: 'app-contact-list',
   templateUrl: './contact-list.component.html',
   styleUrl: './contact-list.component.scss'
 })
-export class ContactListComponent implements OnInit {
+export class ContactListComponent implements OnInit, OnDestroy {
 
   contactList: ContactType [] = [];
-  existingIds = new Set<number>();
+  succesUploadContact$!: Observable<string | null>;
+  failedUploadContact$!: Observable<string | null>;
+  subscriptions = new Subscription();
+  isButtonDisabled = false;
 
   constructor(private backendService: BackendService, private store: Store<{newContact: ContactType}>) {
   }
 
   ngOnInit(): void {
+    this.succesUploadContact$ = this.store.pipe(select(selectUpdateContactsSuccess));
+    this.failedUploadContact$ = this.store.pipe(select(selectUpdateContactsError));
+    this.hideMessages();
   }
 
-  addRandomContact() {
-    this.backendService.getNewContactData(10).subscribe(newContacts => {
-      this.contactList.push(...newContacts);
-      this.storeNewContacts(newContacts);
-    });
+  hideMessages(): void {
+
+  }
+
+  addRandomContacts(): void {
+    if (this.isButtonDisabled) {
+      return;
+    }
+  
+    this.isButtonDisabled = true;
+  
+    this.backendService.getNewContactData(10).pipe(
+      switchMap(newContacts => {
+        this.contactList.push(...newContacts);
+        this.storeNewContacts(newContacts);
+        // Disable the button for 5 seconds
+        return timer(5000);
+      }),
+      finalize(() => {
+        this.isButtonDisabled = false;
+      })
+    ).subscribe();
   }
 
   storeNewContacts(newContacts: FetchedContactType[]): void {
@@ -49,6 +74,10 @@ export class ContactListComponent implements OnInit {
       gender: contact.gender,
       phone: contact.phone 
     }));
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
   }
 
 }
