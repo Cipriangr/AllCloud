@@ -1,4 +1,4 @@
-@import '../../styles.scss';
+@import '../../../styles.scss';
 
 .contacts {
   display: flex;
@@ -9,7 +9,7 @@
     margin: 10px 10px 15px 10px;
     justify-content: space-around;
     border-radius: 150px 0;
-    box-shadow: -1px -1px 2px #eee, -1px 0px 3px #eee, -4px 8px 8px rgba(0, 0, 0, 0.1), -8px 16px 16px rgba(0, 0, 0, 0.1), -16px 32px 32px rgba(0, 0, 0, 0.15), -32px 64px 64px rgba(23, 128, 177, 0.35);
+    box-shadow: 0 1px 0 #ccc, 0 2px 0 #c9c9c9, 0 3px 0 #bbb, 0 0px 0 #b9b9b9, 0 5px 0 rgba(125, 125, 125, 0.2), 0 6px 1px rgba(0, 0, 0, 0.2), 0 0 5px rgba(0, 0, 0, 0.2), 0 1px 3px rgba(0, 0, 0, 0.2), 0 3px 5px rgba(0, 0, 0, 0.2), 0 5px 10px rgba(0, 0, 0, 0.2), 0 10px 10px rgba(0, 0, 0, 0.2), 0 20px 20px rgba(0, 0, 0, 0.2), 0 0 4px white, 0 0px 3px white, 1px 1px 5px rgba(255, 155, 0, 0.37), 1px 1px 10px rgba(102, 60, 0, 0.5); 
     padding: 15px 5px 10px 10px;
 
     @media (width <=500px) {
@@ -24,12 +24,12 @@
       width: 15%;
       display: flex;
       justify-content: center;
-      margin-right: 0.1rem;
-
+      align-items: center;
       img {
         border-radius: 50%;
-        max-width: 70%;
-        height: auto;
+        // max-width: 70%;
+        // height: 55px;
+        aspect-ratio: 1/1;
       }
 
       @media (width <=500px) {
@@ -43,6 +43,9 @@
       width: 60%;
       overflow: hidden;
 
+      .mobile-view {
+        display: none;
+      }
       .small-ellipsis {
         white-space: nowrap;
         overflow: hidden;
@@ -51,10 +54,15 @@
         display: flex;
         flex-direction: row-reverse;
         margin: 3px 0;
+        align-items: center;
 
         &:hover {
           font-weight: 700;
           transition: all 0.25s ease-in-out;
+        }
+        
+        img {
+          padding-right: 5px;
         }
 
         @media (width <=450px) {
@@ -63,19 +71,25 @@
           text-overflow: ellipsis;
           margin: 5px 0;
 
-          img {
-            display: none;
+          .phone-view {
+            display: block;
           }
-        }
-
-        img {
-          padding-right: 3px;
         }
       }
 
       @media (width <=600px) {
         width: 50%;
         max-width: 250px;
+        .small-ellipsis {
+          display: block;
+          img {
+            display: none;
+          }
+        }
+        .mobile-view {
+          color: black;
+          display: block;
+        }
       }
 
       @media (width <=400px) {
@@ -100,12 +114,12 @@
         text-decoration: none;
         display: flex;
         align-items: center;
-        color: $red;
+        color: $blue;
         overflow: hidden;
         max-width: fit-content;
 
         img {
-          width: 35px;
+          width: 30px;
           height: auto;
         }
 
@@ -154,7 +168,7 @@
         overflow: hidden;
 
         &:hover {
-          color: $red;
+          color: $blue;
         }
       }
     }
@@ -168,30 +182,25 @@
         width: 20%;
       }
 
-      .arrow {
-        transition: all 0.25s ease-in-out;
+      .detail-button {
+        .arrow {
+          display: block;
+          transition: all 0.25s ease-in-out;
+          background-image: url('/assets/arrowblue.png');
+          background-size: contain;
+          background-position: center;
+          background-repeat: no-repeat;
+          width: 40px;
+          height: 50px;
 
-        background-image: url('/assets/arrowblue.png');
-        background-size: contain;
-        background-position: center;
-        background-repeat: no-repeat;
-        width: 40px;
-        height: 50px;
+          &::before {
+            background-color: transparent;
+          }  
 
-        &::before {
-          background-color: transparent;
-        }
-
-        // img {
-
-        //   @media (width <=500px) {
-        //     width: 33px;
-        //   }
-        // }
-
-        &:hover {
-          transform: translateX(20px);
-          cursor: pointer;
+          &:hover {
+            transform: translateX(20px);
+            cursor: pointer;
+          }
         }
       }
     }

@@ -1,49 +1,29 @@
 @import '../../../styles.scss';
 
-.action-buttons {
-  display: flex;
-  justify-content: flex-end;
-  margin: 0 0px 10px 0;
+.contact-list {
 
-  button {
-    background-color: transparent;
-    border: 2px solid $light-blue;
-    padding: 5px 10px;
-    border-radius: 10px;
-    font-weight: 700;
-    color: $blue;
-    font-size: 16px;
-    transition: all 0.25s ease-in-out;
+  .error-upload {
+    text-align: center;
+  }
 
-    &:nth-child(1) {
-      margin-right: 10px;
+  .upload {
+    display: flex;
+    justify-content: center;
+    font-size: 18px;
+    margin-bottom: 5px;
+    font-weight: bold;
+    .error {
+      color: red;
     }
-
-    &:hover {
-      cursor: pointer;
-      background-color: $light-blue;
-      color: white;
-    }
-    &:disabled {
-      color: gray;
-      border: 2px solid gray;
+    .success {
+      color: green;
     }
   }
-}
-.error-upload {
-  text-align: center;
-}
 
-.upload {
-  display: flex;
-  justify-content: center;
-  font-size: 18px;
-  margin-bottom: 5px;
-  font-weight: bold;
-  .error {
-    color: red;
-  }
-  .success {
-    color: green;
+  .deleted-message {
+    h2{
+      text-align: center;
+      color: green;
+    }
   }
 }

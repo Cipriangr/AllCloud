@@ -1,0 +1,32 @@
+<div *ngIf="contact" class="contact">
+  <div class="picture">
+    <img [src]="contact.large" alt="Contact Image">
+  </div>
+  <div class="action-buttons">
+    <button>Edit Contact</button>
+    <button (click)="deleteContact(contact.id)">Delete Contact</button>
+  </div>
+  <div *ngIf="deleteError" class="error">
+    <span>Error on deleting contact</span>
+  </div>
+  <h2>{{ contact.title }}. {{ contact.firstName }} {{ contact.lastName }}</h2>
+  <div class="phone-text">
+    <a href="tel:{{contact.phone}}">{{ contact.phone }}</a>
+  </div>
+  <div class="icons">
+    <a class="email" href="mailto:{{contact.email}}">
+      <img src="assets/email.png" alt="phone-img">
+    </a>
+    <a class="phone" href="tel:{{contact.phone}}">
+      <img src="assets/phone.png" alt="phone-img">
+    </a>
+  </div>
+  <div class="info">
+    <div>
+      <span>Age: {{ contact.age }}</span>
+    </div>
+    <div>
+      <span>Gender: {{ contact.gender }}</span>
+    </div>
+  </div>
+</div>

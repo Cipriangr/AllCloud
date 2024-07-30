@@ -2,8 +2,8 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { BackendService } from '../../backend.service';
 import { ContactType, FetchedContactType } from '../../interfaces';
 import { select, Store } from '@ngrx/store';
-import { updateContacts } from '../../store/actions/contacts.actions';
-import { finalize, Observable, Subscription, switchMap, timer } from 'rxjs';
+import { clearErrorMessage, clearSuccessMessage, updateContacts } from '../../store/actions/contacts.actions';
+import { finalize, Observable, of, Subject, Subscription, switchMap, takeUntil, timer } from 'rxjs';
 import { selectUpdateContactsError, selectUpdateContactsSuccess } from '../../store/selectors/contacts.selectors';
 
 @Component({
@@ -13,11 +13,14 @@ import { selectUpdateContactsError, selectUpdateContactsSuccess } from '../../st
 })
 export class ContactListComponent implements OnInit, OnDestroy {
 
-  contactList: ContactType [] = [];
+  contactList: ContactType[] = [];
   succesUploadContact$!: Observable<string | null>;
   failedUploadContact$!: Observable<string | null>;
   subscriptions = new Subscription();
   isButtonDisabled = false;
+  isDeletedTriggered = false;
+  deletedMessage = '';
+  destroy$ = new Subject<void>();
 
   constructor(private backendService: BackendService, private store: Store<{newContact: ContactType}>) {
   }
@@ -25,25 +28,76 @@ export class ContactListComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.succesUploadContact$ = this.store.pipe(select(selectUpdateContactsSuccess));
     this.failedUploadContact$ = this.store.pipe(select(selectUpdateContactsError));
-    this.hideMessages();
+    this.hideUploadMessages();
+    this.handleDeletedContactMessage();
   }
 
-  hideMessages(): void {
+  handleDeletedContactMessage(): void {
+    this.backendService.deleteObservable$.subscribe({
+      next:((response) => {
+        this.deletedMessage = response;
+        this.isDeletedTriggered = true;
+        //easier way to make message dissapear from template after 3 seconds instead of NRGX way
+        timer(4000).subscribe(() => this.deletedMessage = '');
+      })
+    })
+  }
 
+  contactDeleted(): boolean {
+    return !!this.deletedMessage && this.isDeletedTriggered;
+  }
+  handleSuccessMessages(): void {
+    this.subscriptions.add(
+      this.succesUploadContact$.pipe(
+        switchMap(message => {
+          if (message) {
+            return timer(4000).pipe(
+              switchMap(() => {
+                this.store.dispatch(clearSuccessMessage());
+                return of(null); // Complete the observable
+              })
+            );
+          }
+          return of(null); // No message, so complete immediately
+        }),
+        takeUntil(this.destroy$)
+      ).subscribe()
+    );
+  }
+
+  handleErrorMessages(): void {
+    this.subscriptions.add(
+      this.failedUploadContact$.pipe(
+        switchMap(message => {
+          if (message) {
+            return timer(3000).pipe(
+              switchMap(() => {
+                this.store.dispatch(clearErrorMessage());
+                return of(null);
+              })
+            );
+          }
+          return of(null);
+        }),
+        takeUntil(this.destroy$)
+      ).subscribe()
+    );
+  }
+
+  hideUploadMessages(): void {
+    this.handleSuccessMessages();
+    this.handleErrorMessages();
   }
 
   addRandomContacts(): void {
     if (this.isButtonDisabled) {
       return;
     }
-  
     this.isButtonDisabled = true;
-  
     this.backendService.getNewContactData(10).pipe(
       switchMap(newContacts => {
-        this.contactList.push(...newContacts);
         this.storeNewContacts(newContacts);
-        // Disable the button for 5 seconds
+        // Disable the button for 5 seconds after pressing
         return timer(5000);
       }),
       finalize(() => {
@@ -77,6 +131,8 @@ export class ContactListComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
     this.subscriptions.unsubscribe();
   }
 
