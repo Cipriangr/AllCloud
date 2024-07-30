@@ -17,11 +17,11 @@ export class NewContactComponent implements OnInit {
   contactFormGroup!: FormGroup;
   errorForm: boolean = false;
   contact: ContactType[] = [];
-  // contacts$: Observable<ContactType[]>;
+  contacts$: Observable<ContactType[]>;
 
   constructor(private store: Store<{contacts: ContactsState}>, private formBuilder: FormBuilder, private backendService: BackendService,
               private router: Router) {
-    // this.contacts$ = this.store.pipe(select(selectAllContacts));
+    this.contacts$ = this.store.pipe(select(selectAllContacts));
   }
 
   ngOnInit(): void {
@@ -34,7 +34,7 @@ export class NewContactComponent implements OnInit {
       image: [null],
       gender: ['Male']
     });
-    // this.store.dispatch(loadContacts());
+    this.store.dispatch(loadContacts());
   }
 
   checkValidInput(ControlType: string): boolean {

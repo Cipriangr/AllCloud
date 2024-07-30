@@ -47,19 +47,6 @@
   }
   .submit {
     margin-top: 10px;
-    background-color: transparent;
-    border: 2px solid $light-blue;
-    padding: 5px 10px;
-    border-radius: 10px;
-    font-weight: 700;
-    color: $blue;
-    font-size: 20px;
-    transition: all 0.25s ease-in-out;
-    &:hover {
-      cursor: pointer;
-      background-color: $light-blue;
-      color: white;
-    }
   }
   .create-form {
     display: flex;
