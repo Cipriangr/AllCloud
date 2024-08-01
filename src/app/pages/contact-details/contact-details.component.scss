@@ -10,14 +10,6 @@
   div {
     margin-bottom: 10px;
   }
-  .picture {
-    // display: flex;
-    // justify-content: center;
-    margin-bottom: 10px;
-    img {  
-      border-radius: 50%;
-    }
-  }
   .error {
     span {
       color: red;
@@ -47,7 +39,7 @@
       } 
     }
   }
-  .info {
+  .informations {
     display: flex;
     justify-content: space-evenly;
     width: 50%;

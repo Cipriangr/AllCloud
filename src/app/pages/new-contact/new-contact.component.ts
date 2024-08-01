@@ -3,7 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { select, Store } from '@ngrx/store';
 import { loadContacts, updateContacts } from '../../store/actions/contacts.actions';
 import { ContactFormData, ContactsState, ContactType } from '../../interfaces';
-import { BackendService } from '../../backend.service';
+import { BackendService } from '../../core.service';
 import { selectAllContacts } from '../../store/selectors/contacts.selectors';
 import { Observable } from 'rxjs';
 import { Router } from '@angular/router';
@@ -42,7 +42,7 @@ export class NewContactComponent implements OnInit {
     if (!control?.valid) {
       return false;
     }
-    //Form should be valid to be able to press Submit;
+    //all inputs should be valid to be able to press Submit;
     return control?.valid;
   }
 

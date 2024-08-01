@@ -1,16 +1,18 @@
-import { Component, OnInit } from '@angular/core';
-import { BackendService } from '../../backend.service';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { BackendService } from '../../core.service';
 import { ContactType } from '../../interfaces';
 import { ActivatedRoute, Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-contact-details',
   templateUrl: './contact-details.component.html',
   styleUrl: './contact-details.component.scss'
 })
-export class ContactDetailsComponent implements OnInit {
+export class ContactDetailsComponent implements OnInit, OnDestroy {
   contact: ContactType | undefined;
   deleteError: boolean = false;
+  private subscriptions = new Subscription();
 
   constructor(private backendService: BackendService, private activatedRoute: ActivatedRoute, private route: Router) {
   }
@@ -25,20 +27,26 @@ export class ContactDetailsComponent implements OnInit {
 
   //get ContactId so I can use it to display the contact informations
   getContactId() {
-    this.activatedRoute.params.subscribe(params => {
+    const contactId = this.activatedRoute.params.subscribe(params => {
       console.log('!!params', params);
       const id = params['id'];
-      this.backendService.loadContactById(id).subscribe({
+      const contactData = this.backendService.loadContactById(id).subscribe({
         next: contact => {
           console.log('!!contact', contact);
           this.contact = contact;
         }
       })
+      this.subscriptions.add(contactData);
     })
+    this.subscriptions.add(contactId);
+  }
+
+  navigateToEdit(id: number) {
+    this.route.navigate(['/contact-details', id, 'edit']);
   }
 
   deleteContact(id: number): void {
-    this.backendService.deleteContact(id).subscribe({
+    const deleteSub = this.backendService.deleteContact(id).subscribe({
       next: () => {
         this.backendService.deleteMessage('Contact Deleted Succesfully');
         this.route.navigate(['/contact-list'])
@@ -48,5 +56,10 @@ export class ContactDetailsComponent implements OnInit {
         this.route.navigate(['/contact-list']);
       }
     });
+    this.subscriptions.add(deleteSub);
+  }
+
+  ngOnDestroy() {
+    this.subscriptions.unsubscribe();
   }
 }

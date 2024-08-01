@@ -37,3 +37,33 @@ $pale-red: #f08990;
     }
   }
 }
+
+.errorForm {
+  text-align: center;
+  h4 {
+    margin: 5px 0;
+    color: red;
+  }
+}
+
+.info {
+  margin-top: 3px;
+  display: flex;
+  align-items: center;
+  img {
+    width: 15px;
+    margin-right: 3px;
+  }
+  span {
+    color: red;
+  }
+}
+
+.contact-picture {
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: center;
+  img {  
+    border-radius: 50%;
+  }
+}

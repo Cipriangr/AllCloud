@@ -18,6 +18,26 @@ app.use(cors({ origin: 'http://localhost:4200' }));
 
 const router = express.Router();
 
+function getRandomDigit() {
+    return Math.floor(Math.random() * 10);
+}
+
+function sanitizePhoneNumbers(contacts) {
+    return contacts.map(contact => {
+        if (contact.phone) {
+            // Remove non-numeric characters but also remove or add digits if less or more than 10 digits
+            contact.phone = contact.phone.replace(/\D/g, '');
+            while (contact.phone.length < 10) {
+                contact.phone += getRandomDigit();
+            }
+            if (contact.phone.length > 10) {
+                contact.phone = contact.phone.substring(0, 10);
+            }
+        }
+        return contact;
+    });
+}
+
 router.get('/users', (req, res) => {
     db.all('SELECT * FROM users', (err, rows) => {
         if (err) {
@@ -30,16 +50,15 @@ router.get('/users', (req, res) => {
 
 
 router.post('/upload', (req, res) => {
-    const contacts = req.body;
-
-    // Log received contacts for debugging
-    console.log('Received request body:', contacts);
+    let contacts = req.body;
 
     // Validate the received data
     if (!Array.isArray(contacts) || contacts.length === 0) {
         console.error('Invalid contacts data:', contacts);
         return res.status(400).send('Invalid contacts data');
     }
+
+    contacts = sanitizePhoneNumbers(contacts);
 
     // Generate SQL placeholders and values
     const placeholders = contacts.map(() => '(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)').join(',');
@@ -87,10 +106,62 @@ router.get('/users/:id', (req, res) => {
         } else if (!row) {
             res.status(404).send('User not found');
         } else {
+            // i want to sanitize the phone number to return only numbers
+            row.phone = row.phone.replace(/\D/g, '');
             res.json(row);
         }
     });
 });
+
+router.put('/users/:id', (req, res) => {
+    const contactId = parseInt(req.params.id, 10);
+    const { firstName, lastName, email, phone, age, gender, title, large, medium, thumbnail } = req.body;
+
+    if (!contactId || !firstName || !lastName || !email || !phone || !age || !gender) {
+        return res.status(400).send('Invalid contact data');
+    }
+
+    const sql = `UPDATE users SET 
+                 firstName = ?, 
+                 lastName = ?, 
+                 email = ?, 
+                 phone = ?, 
+                 age = ?, 
+                 gender = ?, 
+                 title = ?, 
+                 large = ?, 
+                 medium = ?, 
+                 thumbnail = ? 
+                 WHERE id = ?`;
+
+    const values = [firstName, lastName, email, phone, age, gender, title, large, medium, thumbnail, contactId];
+
+    // Execute SQL query
+    db.run(sql, values, function(err) {
+        if (err) {
+            console.error('Error updating contact:', err.message);
+            let errorMessage = 'An error occurred while updating the contact';
+
+            if (err.message.includes('UNIQUE constraint failed')) {
+                if (err.message.includes('users.email')) {
+                    errorMessage = 'Email is already used. Edit existing contact';
+                } else if (err.message.includes('users.phone')) {
+                    errorMessage = 'Phone number is already used. Edit existing contact';
+                }
+            }
+
+            res.status(400).send({ errorMessage });
+        } else if (this.changes === 0) {
+            // No rows updated, which means the contact ID was not found
+            res.status(404).send('Contact not found');
+        } else {
+            // Successfully updated
+            console.log('Contact updated successfully');
+            res.status(200).send({ message: 'Contact updated successfully' });
+        }
+    });
+});
+
 
 router.delete('/users/:id', (req, res) => {
     const userId = parseInt(req.params.id, 10);
