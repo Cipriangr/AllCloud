@@ -1,0 +1,92 @@
+<div *ngIf="contactFormGroup && contact" class="contact-edit">
+  <h2>Edit {{ contact.firstName }} {{contact.lastName}} contact</h2>
+  <div class="contact-picture">
+    <img [src]="contact.large" alt="Contact Image">
+  </div>
+  <form [formGroup]="contactFormGroup" (ngSubmit)="onSubmit()">
+
+    <div class="columns">
+      <div class="form-group">
+        <label for="firstName">First Name</label>
+        <div class="content">
+          <input id="firstName" type="text" formControlName="firstName">
+          <span class="required">*</span>
+        </div>
+        <div class="info" *ngIf="!checkValidInput('firstName')">
+          <img src="assets/info.png">
+          <span>Minimum length must be 3 characters and maximum 25</span>
+        </div>
+      </div>
+  
+      <div class="form-group">
+        <label for="lastName">Last Name</label>
+        <div class="content">
+          <input id="lastName" type="text" formControlName="lastName">
+          <span class="required">*</span>
+        </div>
+        <div class="info" *ngIf="!checkValidInput('lastName')">
+          <img src="assets/info.png">
+          <span>Minimum length must be 3 characters and maximum 25</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="columns">
+      <div class="form-group">
+        <label for="email">Email</label>
+        <div class="content">
+          <input id="email" type="email" formControlName="email">
+          <span class="required">*</span>
+        </div>
+        <div class="info" *ngIf="!checkValidInput('email')">
+          <img src="assets/info.png">
+          <span>Type a valid email</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="phone">Phone number</label>
+        <div class="content">
+          <input id="phone" type="tel" formControlName="phone">
+          <span class="required">*</span>
+        </div>
+        <div class="info" *ngIf="!checkValidInput('phone')">
+          <img src="assets/info.png">
+          <span>Phone number must have 10 digits</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="columns">
+      <div class="form-group">
+        <label for="age">Age</label>
+        <div class="content">
+          <input id="age" type="number" formControlName="age">
+          <span class="required">*</span>
+        </div>
+        <div class="info" *ngIf="!checkValidInput('age')">
+          <img src="assets/info.png">
+          <span>Type a valid age (5 - 99)</span>
+        </div>
+      </div>
+  
+      <div class="form-group">
+        <label for="gender">Gender</label>
+        <div class="content">
+          <select id="gender" name="gender" formControlName="gender">
+            <option value="Male">Male</option>
+            <option value="Female" [selected]="'Female'">Female</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    
+    <div *ngIf="contactError" class="errorForm">
+      <h4>Contact couldn't be updated</h4>
+    </div>
+  
+    <div class="create-form action-buttons">
+      <button type="submit">Save Contact</button>
+    </div>
+  </form>
+
+</div>

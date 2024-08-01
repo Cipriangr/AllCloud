@@ -14,8 +14,11 @@
       {{ errorMessage }}
     </span>
   </div>
-  <div class="deleted-message" *ngIf="contactDeleted()">
+  <div class="custom-message" *ngIf="showDeleteMessage()">
     <h2>{{ deletedMessage }}</h2>
+  </div>
+  <div class="custom-message" *ngIf="showEditMessage()">
+    <h2>{{ editedMessage }}</h2>
   </div>
   <app-users-list></app-users-list>
 </div>

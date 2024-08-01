@@ -13,6 +13,8 @@ export class BackendService {
   contacts$ = this.contactsBehaviour.asObservable();
   deleteSubject$ = new BehaviorSubject<string>('');
   deleteObservable$ = this.deleteSubject$.asObservable();
+  contactEditSubject$ = new BehaviorSubject<string>('');
+  contactEditObservable$ = this.contactEditSubject$.asObservable();
 
   constructor(private httpClient: HttpClient) { }
 
@@ -32,7 +34,7 @@ export class BackendService {
     return this.httpClient.get<ContactType>(`${this.baseServerUrl}/users/${id}`);
   }
 
-  updateContacts(contacts: ContactType[]): Observable<ContactType[]> {
+  addNewContact(contacts: ContactType[]): Observable<ContactType[]> {
     return this.httpClient.post<any>(`${this.baseServerUrl}/upload`, contacts, {
         headers: new HttpHeaders({ 'Content-Type': 'application/json' })
     }).pipe(
@@ -45,10 +47,19 @@ export class BackendService {
     )
   }
 
+  updateContact(contact: ContactType): Observable<string> {
+    const url = `${this.baseServerUrl}/users/${contact.id}`;
+    return this.httpClient.put<any>(url, contact, {
+      headers: new HttpHeaders({ 'Content-Type': 'application/json' })
+    }).pipe(
+      map(response => response.message), 
+      catchError(error => throwError(() => new Error(error.error.errorMessage || 'Unknown error')))
+    );
+  }
+
   deleteContact(id: number): Observable<number> {
     return this.httpClient.delete<number>(`${this.baseServerUrl}/users/${id}`).pipe(
       catchError(error => {
-        this.deleteSubject$.next('Error deleting contact');
         return throwError(() => new Error(error.error.errorMessage));
       })
     )
@@ -56,6 +67,15 @@ export class BackendService {
 
   deleteMessage(text: string): void {
     this.deleteSubject$.next(text);
+  }
+
+  contactEditMessage(text: string): void {
+    this.contactEditSubject$.next(text);
+  }
+
+  resetMessages(): void {
+    this.deleteSubject$.next('');
+    this.contactEditSubject$.next('');
   }
 
   getNewContactData(requests: number) {

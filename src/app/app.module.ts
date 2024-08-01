@@ -1,13 +1,12 @@
-import { NgModule } from '@angular/core';
-import { bootstrapApplication, BrowserModule } from '@angular/platform-browser';
+import { NgModule, isDevMode } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { BackendService } from './backend.service';
+import { BackendService } from './core.service';
 import { HttpClientModule } from '@angular/common/http';
 import { UsersListComponent } from './components/users-list/users-list.component';
 import { NavbarComponent } from './components/navbar/navbar.component';
-import { provideRouter, Routes } from '@angular/router';
 import { ContactListComponent } from './pages/contact-list/contact-list.component';
 import { PageNotFoundComponent } from './pages/page-not-found/page-not-found.component';
 import { StoreModule } from '@ngrx/store';
@@ -17,6 +16,8 @@ import { EffectsModule } from '@ngrx/effects';
 import { NewContactComponent } from './pages/new-contact/new-contact.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ContactDetailsComponent } from './pages/contact-details/contact-details.component';
+import { ContactEditComponent } from './pages/contact-edit/contact-edit.component';
+import { ServiceWorkerModule } from '@angular/service-worker';
 
 @NgModule({
   declarations: [
@@ -26,7 +27,8 @@ import { ContactDetailsComponent } from './pages/contact-details/contact-details
     ContactListComponent,
     PageNotFoundComponent,
     NewContactComponent,
-    ContactDetailsComponent
+    ContactDetailsComponent,
+    ContactEditComponent
   ],
   imports: [
     BrowserModule,
@@ -34,7 +36,13 @@ import { ContactDetailsComponent } from './pages/contact-details/contact-details
     HttpClientModule,
     StoreModule.forRoot({contacts: contactsReducer}),
     EffectsModule.forRoot([ContactsEffects]),
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    ServiceWorkerModule.register('ngsw-worker.js', {
+      enabled: !isDevMode(),
+      // Register the ServiceWorker as soon as the application is stable
+      // or after 30 seconds (whichever comes first).
+      registrationStrategy: 'registerWhenStable:30000'
+    })
   ],
   providers: [
     BackendService,

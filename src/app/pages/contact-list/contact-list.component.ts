@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { BackendService } from '../../backend.service';
+import { BackendService } from '../../core.service';
 import { ContactType, FetchedContactType } from '../../interfaces';
 import { select, Store } from '@ngrx/store';
 import { clearErrorMessage, clearSuccessMessage, updateContacts } from '../../store/actions/contacts.actions';
@@ -19,8 +19,11 @@ export class ContactListComponent implements OnInit, OnDestroy {
   subscriptions = new Subscription();
   isButtonDisabled = false;
   isDeletedTriggered = false;
+  isEditedTriggered = false;
   deletedMessage = '';
+  editedMessage = ''
   destroy$ = new Subject<void>();
+  messageTimer: number = 4000;
 
   constructor(private backendService: BackendService, private store: Store<{newContact: ContactType}>) {
   }
@@ -28,30 +31,61 @@ export class ContactListComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.succesUploadContact$ = this.store.pipe(select(selectUpdateContactsSuccess));
     this.failedUploadContact$ = this.store.pipe(select(selectUpdateContactsError));
-    this.hideUploadMessages();
-    this.handleDeletedContactMessage();
+    this.handleMessages();
   }
 
   handleDeletedContactMessage(): void {
-    this.backendService.deleteObservable$.subscribe({
+    const deleteObs = this.backendService.deleteObservable$.subscribe({
       next:((response) => {
-        this.deletedMessage = response;
-        this.isDeletedTriggered = true;
-        //easier way to make message dissapear from template after 3 seconds instead of NRGX way
-        timer(4000).subscribe(() => this.deletedMessage = '');
+        if (response) {
+          console.log('!!response0', response);
+          this.deletedMessage = response;
+          this.isDeletedTriggered = true;
+          //easier way to make message dissapear from template after 4 seconds instead of NRGX way
+          timer(4000).subscribe(() => {
+            this.deletedMessage = '';
+            this.isDeletedTriggered = false;
+            this.backendService.resetMessages();
+            
+          });
+        }
       })
     })
+    this.subscriptions.add(deleteObs);
   }
 
-  contactDeleted(): boolean {
+  handleEditedContactMessage(): void {
+    const editObs = this.backendService.contactEditObservable$.subscribe({
+      next:((response) =>{
+        if (response) {
+          console.log('!!response', response);
+          this.editedMessage = response;
+          this.isEditedTriggered = true;
+          timer(4000).subscribe(() =>  {
+            this.editedMessage = '';
+            this.isEditedTriggered = false;
+            this.backendService.resetMessages();
+          });
+        }
+      })
+    })
+    this.subscriptions.add(editObs);
+  }
+
+  showDeleteMessage(): boolean {
     return !!this.deletedMessage && this.isDeletedTriggered;
   }
+
+  showEditMessage(): boolean {
+    return !!this.editedMessage && this.isEditedTriggered;
+  }
+
   handleSuccessMessages(): void {
-    this.subscriptions.add(
+    const successObS = this.subscriptions.add(
       this.succesUploadContact$.pipe(
         switchMap(message => {
           if (message) {
-            return timer(4000).pipe(
+            return timer(this.messageTimer).pipe(
               switchMap(() => {
                 this.store.dispatch(clearSuccessMessage());
                 return of(null); // Complete the observable
@@ -63,14 +97,15 @@ export class ContactListComponent implements OnInit, OnDestroy {
         takeUntil(this.destroy$)
       ).subscribe()
     );
+    this.subscriptions.add(successObS);
   }
 
   handleErrorMessages(): void {
-    this.subscriptions.add(
+    const errorSub = this.subscriptions.add(
       this.failedUploadContact$.pipe(
         switchMap(message => {
           if (message) {
-            return timer(3000).pipe(
+            return timer(this.messageTimer).pipe(
               switchMap(() => {
                 this.store.dispatch(clearErrorMessage());
                 return of(null);
@@ -82,11 +117,14 @@ export class ContactListComponent implements OnInit, OnDestroy {
         takeUntil(this.destroy$)
       ).subscribe()
     );
+    this.subscriptions.add(errorSub);
   }
 
-  hideUploadMessages(): void {
+  handleMessages(): void {
     this.handleSuccessMessages();
     this.handleErrorMessages();
+    this.handleDeletedContactMessage();
+    this.handleEditedContactMessage();
   }
 
   addRandomContacts(): void {
@@ -94,16 +132,17 @@ export class ContactListComponent implements OnInit, OnDestroy {
       return;
     }
     this.isButtonDisabled = true;
-    this.backendService.getNewContactData(10).pipe(
+    const newContactsSub = this.backendService.getNewContactData(10).pipe(
       switchMap(newContacts => {
         this.storeNewContacts(newContacts);
         // Disable the button for 5 seconds after pressing
-        return timer(5000);
+        return timer(this.messageTimer);
       }),
       finalize(() => {
         this.isButtonDisabled = false;
       })
     ).subscribe();
+    this.subscriptions.add(newContactsSub);
   }
 
   storeNewContacts(newContacts: FetchedContactType[]): void {
@@ -113,8 +152,8 @@ export class ContactListComponent implements OnInit, OnDestroy {
 
   convertContacts(contacts: FetchedContactType[]): ContactType[] {
     return contacts.map((contact: FetchedContactType) => ({
-      //Sometimes API is sending id.value as undefined so i will generate random ID for this case.
-      //Anyway, I think the better solution would be to use Set for not having duplicates values.
+      //Sometimes API is sending id.value as undefined so i will generate random ID for this case even if ID can be duplicated.
+      //Anyway, I think the best solution would be to use Set for not having duplicates values.
       //I will improve it if I have time as the last task 
       id: this.backendService.assignOrConvertId(contact.id.value),
       lastName: contact.name.last,
@@ -133,6 +172,8 @@ export class ContactListComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+    //clean the texts if user switches navigates to another page and back to contact-list faster than tthis.timer so it won't see the message
+    this.backendService.resetMessages();
     this.subscriptions.unsubscribe();
   }
 

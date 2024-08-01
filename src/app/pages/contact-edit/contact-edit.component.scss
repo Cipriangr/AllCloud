@@ -1,0 +1,75 @@
+@import '../../../styles.scss'; 
+
+.contact-edit{
+  h2 {
+    text-align: center;
+    color: $light-blue;
+  }
+  form {
+    display: flex;
+    flex-direction: column;
+    margin: 0 auto;
+    @media (width <600px) {
+      width: 80%;
+    }
+    .columns {
+      display: flex;
+      gap: 20px;
+      @media (width <600px) {
+        display: block;
+        gap: initial;
+      }
+    }
+    .form-group {
+      padding-bottom: 20px;
+      width: 100%;
+      label {
+        display: block;
+        margin-bottom: 2px;
+        font-size: 18px;
+        font-weight: bold;
+        color: $blue;
+        max-width: fit-content;
+      }
+      .content {
+        display: flex;
+        .ng-valid {
+          background-color: rgba(0, 255, 0, 0.1);
+        }
+        .ng-invalid {
+          background-color: rgba(255, 0, 0, 0.1);
+        }
+
+        input {
+          width: 100%;
+          padding: 3px;
+          font-size: 14px;
+          border: 2px solid $light-blue;
+          @media (width <600px) {
+            width: 100%;
+          }
+        }
+        select {
+          width: 50%;
+          padding: 3px;
+          font-size: 14px;
+          border: 2px solid $light-blue;
+        }
+        .required {
+          color: red;
+          font-size: 22px;
+          margin-left: 3px;
+        }
+      }
+    }
+  }
+  .create-form {
+    display: flex;
+    justify-content: center;
+    margin-top: 5px;
+    button {
+      margin-right: 0;
+      font-size: 18px;
+    }
+  }
+}

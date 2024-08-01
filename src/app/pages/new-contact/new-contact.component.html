@@ -1,4 +1,4 @@
-<div class="new-contact-form">
+<div *ngIf="contactFormGroup" class="new-contact-form">
   <h1>New Contact Form</h1>
   <form [formGroup]="contactFormGroup" (ngSubmit)="submitForm($event)">
     <div class="form-group">
@@ -9,9 +9,10 @@
           *
         </span>
       </div>
-      <span [hidden]="checkValidInput('firstName')">
-        Minimum length must be 3 characters and maximum 25
-      </span>
+      <div class="info" *ngIf="!checkValidInput('firstName')">
+        <img src="assets/info.png">
+        <span>Minimum length must be 3 characters and maximum 25</span>
+      </div>
     </div>
     <div class="form-group">
       <label for="last">Last Name</label>
@@ -21,9 +22,10 @@
           *
         </span>
       </div>
-      <span [hidden]="checkValidInput('lastName')">
-        Minimum length must be 3 characters and maximum 25
-      </span>
+      <div class="info" *ngIf="!checkValidInput('lastName')">
+        <img src="assets/info.png">
+        <span>Minimum length must be 3 characters and maximum 25</span>
+      </div>
     </div>
     <div class="form-group">
       <label for="email">Email</label>
@@ -33,9 +35,10 @@
           *
         </span>
       </div>
-      <span [hidden]="checkValidInput('email')">
-        Type a valid email
-      </span>
+      <div class="info" *ngIf="!checkValidInput('email')">
+        <img src="assets/info.png">
+        <span>Type a valid email</span>
+      </div>
     </div>
     <div class="form-group">
       <label for="age">Age</label>
@@ -45,9 +48,10 @@
           *
         </span>
       </div>
-      <span [hidden]="checkValidInput('age')">
-        Type a valid age (5 - 99)
-      </span>
+      <div class="info" *ngIf="!checkValidInput('age')">
+        <img src="assets/info.png">
+        <span>Type a valid age (5 - 99)</span>
+      </div>
     </div>
     <div class="form-group">
       <label for="phone">Phone number</label>
@@ -57,9 +61,10 @@
           *
         </span>
       </div>
-      <span [hidden]="checkValidInput('phone')">
-        Phone number must have 10 digits
-      </span>
+      <div class="info" *ngIf="!checkValidInput('phone')">
+        <img src="assets/info.png">
+        <span>Phone number must have 10 digits</span>
+      </div>
     </div>
     <div class="form-group">
       <label for="gender">Gender</label>

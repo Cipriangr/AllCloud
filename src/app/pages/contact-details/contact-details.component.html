@@ -1,9 +1,10 @@
 <div *ngIf="contact" class="contact">
-  <div class="picture">
+  <div class="contact-picture">
     <img [src]="contact.large" alt="Contact Image">
   </div>
   <div class="action-buttons">
-    <button>Edit Contact</button>
+    <!-- <a [routerLink]="['/contact-detail', contact.id, 'edit']">Edit Contact</a> -->
+    <button (click)="navigateToEdit(contact.id)">Edit Contact</button>
     <button (click)="deleteContact(contact.id)">Delete Contact</button>
   </div>
   <div *ngIf="deleteError" class="error">
@@ -21,7 +22,7 @@
       <img src="assets/phone.png" alt="phone-img">
     </a>
   </div>
-  <div class="info">
+  <div class="informations">
     <div>
       <span>Age: {{ contact.age }}</span>
     </div>
@@ -29,4 +30,5 @@
       <span>Gender: {{ contact.gender }}</span>
     </div>
   </div>
+  <router-outlet></router-outlet>
 </div>

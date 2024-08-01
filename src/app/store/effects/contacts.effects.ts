@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { of } from 'rxjs';
 import { catchError, exhaustMap, map, mergeMap } from 'rxjs/operators';
-import { BackendService } from '../../backend.service';
+import { BackendService } from '../../core.service';
 import { loadContacts, loadContactsSucces, loadContactsFailure, updateContacts, uploadContactsSuccess, uploadContactsFailure } from '../actions/contacts.actions';
 import { ContactType } from '../../interfaces';
 
@@ -30,7 +30,7 @@ export class ContactsEffects {
     this.actions$.pipe(
       ofType(updateContacts),
       exhaustMap(action => {
-        return this.backendService.updateContacts(action.contacts).pipe(
+        return this.backendService.addNewContact(action.contacts).pipe(
           map(() => uploadContactsSuccess()),
           catchError(error => of(uploadContactsFailure({error: error.message})))
         )

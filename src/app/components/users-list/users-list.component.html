@@ -5,15 +5,13 @@
         </div>
         <div class="info">
             <h4 class="name">{{ user.title }}. {{ user.firstName }} {{ user.lastName }}</h4>
-            <div class="email">
-                <span class="mobile-view">Email: </span>
+            <div class="email common-info">
                 <a href="mailto: {{user.email}}" class="small-ellipsis">
                     {{ user.email }}
                     <img src="assets/email.png" alt="email-img">
                 </a>
             </div>
             <div class="phone">
-                <span class="mobile-view">Number: </span>
                 <a class="phone-img small-ellipsis" href="tel:{{user.phone}}">
                     {{ user.phone }}
                     <img src="assets/phone.png" alt="phone-img">
@@ -21,7 +19,7 @@
             </div>
         </div>
         <div class="detail-page">
-            <a class="detail-button" [routerLink]="['/contact-detail', user.id]">
+            <a class="detail-button" [routerLink]="['/contact-details', user.id]">
                 <span class="arrow"></span>
             </a>
         </div>

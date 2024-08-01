@@ -27,9 +27,10 @@
       align-items: center;
       img {
         border-radius: 50%;
-        // max-width: 70%;
-        // height: 55px;
-        aspect-ratio: 1/1;
+        width: 70px;
+        @media (width <=500px) {
+          width: 50px;
+        }
       }
 
       @media (width <=500px) {
@@ -43,9 +44,6 @@
       width: 60%;
       overflow: hidden;
 
-      .mobile-view {
-        display: none;
-      }
       .small-ellipsis {
         white-space: nowrap;
         overflow: hidden;
@@ -86,10 +84,6 @@
             display: none;
           }
         }
-        .mobile-view {
-          color: black;
-          display: block;
-        }
       }
 
       @media (width <=400px) {
@@ -116,23 +110,18 @@
         align-items: center;
         color: $blue;
         overflow: hidden;
-        max-width: fit-content;
 
         img {
           width: 30px;
           height: auto;
         }
+      }
 
-        // &::before {
-        //   content: '';
-        //   background-image: url('../assets/email.png');
-        //   background-size: contain;
-        //   background-position: center;
-        //   background-repeat: no-repeat;
-        //   width: 35px;
-        //   height: 30px;
-        //   margin-right: 5px;
-        // }
+      .common-info {
+        max-width: -webkit-fill-available;
+        .mobile-view {
+          color: black;
+        }
       }
 
       .phone {
