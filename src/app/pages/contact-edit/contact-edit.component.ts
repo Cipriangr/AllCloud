@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { ContactType } from '../../interfaces';
-import { BackendService } from '../../core.service';
+import { CoreService } from '../../core.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 @Component({
@@ -16,7 +16,7 @@ export class ContactEditComponent implements OnInit, OnDestroy {
   private subscriptions = new Subscription();
   contactFormGroup!: FormGroup;
 
-  constructor(private activatedRoute: ActivatedRoute, private backendService: BackendService,
+  constructor(private activatedRoute: ActivatedRoute, private coreService: CoreService,
               private fb: FormBuilder, private router: Router) {
   }
 
@@ -39,7 +39,7 @@ export class ContactEditComponent implements OnInit, OnDestroy {
   getContactData(): void {
     const routeSubscription = this.activatedRoute.params.subscribe({
       next: (data) => {
-        const contactSubscription = this.backendService.loadContactById(data['id']).subscribe({
+        const contactSubscription = this.coreService.loadContactById(data['id']).subscribe({
           next: contact => {
             this.contactFormGroup.patchValue(contact);
             this.contact = contact;
@@ -66,13 +66,13 @@ export class ContactEditComponent implements OnInit, OnDestroy {
       const updatedContact = { ...this.contact, ...this.contactFormGroup.value };
       console.log('Updated contact data:', updatedContact);
       //update contact and create messages to be displayed on homepage(contact-list)
-      const updateContactSub = this.backendService.updateContact(updatedContact).subscribe({
+      const updateContactSub = this.coreService.updateContact(updatedContact).subscribe({
         next: () => {
-          this.backendService.contactEditMessage('Contact Edited Succesfully');
+          this.coreService.contactEditMessage('Contact Edited Succesfully');
           this.router.navigate(['/contact-list']);
         },
         error: () => {
-          this.backendService.contactEditMessage('Contact edit error');
+          this.coreService.contactEditMessage('Contact edit error');
           console.error('Error updating contact');
         }
       });

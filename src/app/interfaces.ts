@@ -98,3 +98,15 @@ export interface ContactFormData {
 export interface ErrorResponse {
   error: string;
 }
+
+export enum StatusMessage {
+  online = 'Connection restored! Your pending request is now being processed.',
+  offline = 'You are offline. Your request will be processed when you will be back online.'
+}
+
+// export interface RequestSchema extends DBSchema {
+//   requests: {
+//     key: number;
+//     value: { id?: number; data: any };
+//   };
+// }

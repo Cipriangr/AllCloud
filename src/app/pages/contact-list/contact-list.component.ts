@@ -1,10 +1,11 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { BackendService } from '../../core.service';
-import { ContactType, FetchedContactType } from '../../interfaces';
+import { Component, EventEmitter, OnDestroy, OnInit, Output } from '@angular/core';
+import { CoreService } from '../../core.service';
+import { ContactType, FetchedContactType, StatusMessage } from '../../interfaces';
 import { select, Store } from '@ngrx/store';
 import { clearErrorMessage, clearSuccessMessage, updateContacts } from '../../store/actions/contacts.actions';
 import { finalize, Observable, of, Subject, Subscription, switchMap, takeUntil, timer } from 'rxjs';
 import { selectUpdateContactsError, selectUpdateContactsSuccess } from '../../store/selectors/contacts.selectors';
+import { NetworkService } from '../../network-worker.service';
 
 @Component({
   selector: 'app-contact-list',
@@ -25,28 +26,46 @@ export class ContactListComponent implements OnInit, OnDestroy {
   destroy$ = new Subject<void>();
   messageTimer: number = 4000;
 
-  constructor(private backendService: BackendService, private store: Store<{newContact: ContactType}>) {
+  constructor(private coreService: CoreService, private store: Store<{newContact: ContactType}>, private network: NetworkService) {
   }
 
   ngOnInit(): void {
     this.succesUploadContact$ = this.store.pipe(select(selectUpdateContactsSuccess));
     this.failedUploadContact$ = this.store.pipe(select(selectUpdateContactsError));
+    this.loadContacts();
     this.handleMessages();
   }
 
+  loadContacts(): void {
+    this.coreService.loadContactsAsObservable();
+    this.getContactsFromDB();
+  }
+
+  getContactsFromDB(): void {
+    //I could handle with ngrx or Output from contacts-added component. I know is not needed to use both ngrx and rxjs but I implemented both for practice purposes
+    const getContactsSub = this.coreService.contactsObservable$.subscribe({
+      next:((response) => {
+        if (response && response.length > 0) {
+          console.log('!!response', response);
+          this.contactList = response;
+        }
+      })
+    })
+    this.subscriptions.add(getContactsSub);
+  }
+
   handleDeletedContactMessage(): void {
-    const deleteObs = this.backendService.deleteObservable$.subscribe({
+    const deleteObs = this.coreService.deleteObservable$.subscribe({
       next:((response) => {
         if (response) {
           console.log('!!response0', response);
           this.deletedMessage = response;
           this.isDeletedTriggered = true;
           //easier way to make message dissapear from template after 4 seconds instead of NRGX way
-          timer(4000).subscribe(() => {
+          timer(this.messageTimer).subscribe(() => {
             this.deletedMessage = '';
             this.isDeletedTriggered = false;
-            this.backendService.resetMessages();
-            
+            this.coreService.resetMessages();
           });
         }
       })
@@ -55,16 +74,16 @@ export class ContactListComponent implements OnInit, OnDestroy {
   }
 
   handleEditedContactMessage(): void {
-    const editObs = this.backendService.contactEditObservable$.subscribe({
+    const editObs = this.coreService.contactEditObservable$.subscribe({
       next:((response) =>{
         if (response) {
           console.log('!!response', response);
           this.editedMessage = response;
           this.isEditedTriggered = true;
-          timer(4000).subscribe(() =>  {
+          timer(this.messageTimer).subscribe(() =>  {
             this.editedMessage = '';
             this.isEditedTriggered = false;
-            this.backendService.resetMessages();
+            this.coreService.resetMessages();
           });
         }
       })
@@ -128,15 +147,16 @@ export class ContactListComponent implements OnInit, OnDestroy {
   }
 
   addRandomContacts(): void {
-    if (this.isButtonDisabled) {
+    if (!this.network.isUserOnline()) {
+      this.network.updateMessageStatus(StatusMessage.offline);
       return;
     }
     this.isButtonDisabled = true;
-    const newContactsSub = this.backendService.getNewContactData(10).pipe(
+    const newContactsSub = this.coreService.getNewContactData(10).pipe(
       switchMap(newContacts => {
         this.storeNewContacts(newContacts);
-        // Disable the button for 5 seconds after pressing
-        return timer(this.messageTimer);
+        // Disable the button for 5 seconds after pressed
+        return timer(5000);
       }),
       finalize(() => {
         this.isButtonDisabled = false;
@@ -155,7 +175,7 @@ export class ContactListComponent implements OnInit, OnDestroy {
       //Sometimes API is sending id.value as undefined so i will generate random ID for this case even if ID can be duplicated.
       //Anyway, I think the best solution would be to use Set for not having duplicates values.
       //I will improve it if I have time as the last task 
-      id: this.backendService.assignOrConvertId(contact.id.value),
+      id: this.coreService.assignOrConvertId(contact.id.value),
       lastName: contact.name.last,
       email: contact.email,
       firstName: contact.name.first,
@@ -173,7 +193,7 @@ export class ContactListComponent implements OnInit, OnDestroy {
     this.destroy$.next();
     this.destroy$.complete();
     //clean the texts if user switches navigates to another page and back to contact-list faster than tthis.timer so it won't see the message
-    this.backendService.resetMessages();
+    this.coreService.resetMessages();
     this.subscriptions.unsubscribe();
   }
 

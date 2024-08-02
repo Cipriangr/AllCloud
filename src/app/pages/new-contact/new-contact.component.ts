@@ -3,7 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { select, Store } from '@ngrx/store';
 import { loadContacts, updateContacts } from '../../store/actions/contacts.actions';
 import { ContactFormData, ContactsState, ContactType } from '../../interfaces';
-import { BackendService } from '../../core.service';
+import { CoreService } from '../../core.service';
 import { selectAllContacts } from '../../store/selectors/contacts.selectors';
 import { Observable } from 'rxjs';
 import { Router } from '@angular/router';
@@ -19,7 +19,7 @@ export class NewContactComponent implements OnInit {
   contact: ContactType[] = [];
   contacts$: Observable<ContactType[]>;
 
-  constructor(private store: Store<{contacts: ContactsState}>, private formBuilder: FormBuilder, private backendService: BackendService,
+  constructor(private store: Store<{contacts: ContactsState}>, private formBuilder: FormBuilder, private coreService: CoreService,
               private router: Router) {
     this.contacts$ = this.store.pipe(select(selectAllContacts));
   }
@@ -48,7 +48,7 @@ export class NewContactComponent implements OnInit {
 
   saveContactData(contact: ContactFormData): ContactType {
     return {
-      id: this.backendService.assignOrConvertId(),
+      id: this.coreService.assignOrConvertId(),
       lastName: contact.lastName,
       email: contact.email,
       firstName: contact.firstName,

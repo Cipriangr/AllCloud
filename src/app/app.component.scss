@@ -1,18 +1,23 @@
 body,html {
     margin: 0;
     padding: 0;
+    height: 100vh;
+    overflow: hidden;
 }
 * {
     box-sizing: border-box;
 }
 
 main {
-    .allcloud-app {
-        width: 600px;
-    }
-}
-
-.center-elements {
     display: flex;
     justify-content: center;
+    .allcloud-app {
+        width: 600px;
+        .status-message {
+            font-size: 18px;
+            color: red;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+    }
 }

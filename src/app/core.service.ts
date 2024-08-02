@@ -6,11 +6,11 @@ import { BehaviorSubject, catchError, map, Observable, Subject, tap, throwError 
 @Injectable({
   providedIn: 'root'
 })
-export class BackendService {
+export class CoreService {
 
   baseServerUrl = 'http://localhost:3000';
   contactsBehaviour = new BehaviorSubject<ContactType[]>([]);
-  contacts$ = this.contactsBehaviour.asObservable();
+  contactsObservable$ = this.contactsBehaviour.asObservable();
   deleteSubject$ = new BehaviorSubject<string>('');
   deleteObservable$ = this.deleteSubject$.asObservable();
   contactEditSubject$ = new BehaviorSubject<string>('');

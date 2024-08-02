@@ -1,8 +1,11 @@
-<main class="center-elements">
+<main>
   <div class="allcloud-app">
     <header>
       <app-navbar></app-navbar>
     </header>
+    <div *ngIf="statusMessage" class="status-message">
+      {{ statusMessage }}
+    </div>
     <router-outlet></router-outlet>
   </div>
 </main>
