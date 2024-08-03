@@ -1,5 +1,5 @@
 import { createReducer, on } from '@ngrx/store';
-import { clearErrorMessage, clearSuccessMessage, loadContacts, loadContactsFailure, loadContactsSucces, updateContacts, uploadContactsFailure, uploadContactsSuccess } from './actions/contacts.actions';
+import { clearErrorMessage, clearSuccessMessage, loadContacts, loadContactsFailure, loadContactsSucces, addContacts, uploadContactsFailure, uploadContactsSuccess } from './actions/contacts.actions';
 import { ContactsState } from '../interfaces';
 
 export const initialContactState: ContactsState = {
@@ -13,7 +13,7 @@ export const initialContactState: ContactsState = {
 
 export const contactsReducer = createReducer(
   initialContactState,
-  on(updateContacts, (state, { contacts }) => ({
+  on(addContacts, (state, { contacts }) => ({
     ...state,
     contacts: [...state.contacts, ...contacts]
   })),

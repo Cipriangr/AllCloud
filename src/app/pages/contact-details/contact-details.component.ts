@@ -1,8 +1,9 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CoreService } from '../../core.service';
-import { ContactType } from '../../interfaces';
+import { ContactType, RequestType } from '../../interfaces';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Subscription } from 'rxjs';
+import { catchError, of, Subscription, switchMap, tap } from 'rxjs';
+import { NetworkService } from '../../network-worker.service';
 
 @Component({
   selector: 'app-contact-details',
@@ -10,42 +11,69 @@ import { Subscription } from 'rxjs';
   styleUrl: './contact-details.component.scss'
 })
 export class ContactDetailsComponent implements OnInit, OnDestroy {
-  contact: ContactType | undefined;
+  contact!: ContactType;
   deleteError: boolean = false;
   private subscriptions = new Subscription();
+  test: ContactType[] = [];
+  contactError: Boolean = false;
+  contactId!: number;
 
-  constructor(private coreService: CoreService, private activatedRoute: ActivatedRoute, private route: Router) {
+  constructor(private coreService: CoreService, private activatedRoute: ActivatedRoute, private route: Router, private network: NetworkService) {
   }
 
   ngOnInit(): void {
-    this.getContactId();
+    this.getContactData();
     // this.coreService.contacts$.subscribe(
-    //   contact => console.log(contact)
     // )
-    console.log(this.coreService.contactsBehaviour);
   }
 
-  //get ContactId so I can use it to display the contact informations
-  getContactId() {
-    const contactId = this.activatedRoute.params.subscribe(params => {
-      console.log('!!params', params);
-      const id = params['id'];
-      const contactData = this.coreService.loadContactById(id).subscribe({
-        next: contact => {
-          console.log('!!contact', contact);
-          this.contact = contact;
-        }
+  getContactData(): void {
+    const routeSubscription = this.activatedRoute.params.pipe(
+      tap(params => {
+        this.contactId = Number(params['id']);
+      }),
+      switchMap(() => this.coreService.fetchAndCacheContactById(this.contactId)),
+      tap(contact => {
+        this.contact = contact;
+        this.contactError = false;
+      }),
+      catchError(error => {
+        this.contactError = true;
+        console.error('Error fetching contact data:', error);
+        return of(null);
       })
-      this.subscriptions.add(contactData);
-    })
-    this.subscriptions.add(contactId);
+    ).subscribe();
+  
+    this.subscriptions.add(routeSubscription);
   }
+  
+  
+  //get ContactId so I can use it to display the contact informations
+  // getContactId() {
+  //   const contactId = this.activatedRoute.params.subscribe(params => {
+  //     const id = params['id'];
+  //   console.log('!!idPARAM', id);
+  //     const contactData = this.coreService.loadContactByIdWithCache(id).subscribe({
+  //       next: contact => {
+  //         console.log('!!contactComp', contact);
+  //         this.contact = contact;
+  //       }
+  //     })
+  //     this.subscriptions.add(contactData);
+  //   })
+  //   this.subscriptions.add(contactId);
+  // }
 
   navigateToEdit(id: number) {
     this.route.navigate(['/contact-details', id, 'edit']);
   }
 
   deleteContact(id: number): void {
+    if (!this.network.isUserOnline()) {
+      this.network.queueRequest({type: RequestType.deleteContact, payload: id})
+      this.route.navigate(['/contact-list']);
+      return;
+    }
     const deleteSub = this.coreService.deleteContact(id).subscribe({
       next: () => {
         this.coreService.deleteMessage('Contact Deleted Succesfully');
@@ -57,6 +85,13 @@ export class ContactDetailsComponent implements OnInit, OnDestroy {
       }
     });
     this.subscriptions.add(deleteSub);
+  }
+
+  displayImage(contact: ContactType): string {
+    if (!contact.large || !this.network.isUserOnline()) {
+      return "/assets/noimage.webp";
+    }
+    return contact.large;
   }
 
   ngOnDestroy() {

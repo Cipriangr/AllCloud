@@ -1,12 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { select, Store } from '@ngrx/store';
-import { loadContacts, updateContacts } from '../../store/actions/contacts.actions';
-import { ContactFormData, ContactsState, ContactType } from '../../interfaces';
+import { addContacts, loadContacts } from '../../store/actions/contacts.actions';
+import { ContactFormData, ContactsState, ContactType, RequestType } from '../../interfaces';
 import { CoreService } from '../../core.service';
 import { selectAllContacts } from '../../store/selectors/contacts.selectors';
 import { Observable } from 'rxjs';
 import { Router } from '@angular/router';
+import { NetworkService } from '../../network-worker.service';
 
 @Component({
   selector: 'app-new-contact',
@@ -20,7 +21,7 @@ export class NewContactComponent implements OnInit {
   contacts$: Observable<ContactType[]>;
 
   constructor(private store: Store<{contacts: ContactsState}>, private formBuilder: FormBuilder, private coreService: CoreService,
-              private router: Router) {
+              private router: Router, private networkService: NetworkService) {
     this.contacts$ = this.store.pipe(select(selectAllContacts));
   }
 
@@ -34,7 +35,7 @@ export class NewContactComponent implements OnInit {
       image: [null],
       gender: ['Male']
     });
-    this.store.dispatch(loadContacts());
+    // this.store.dispatch(loadContacts());
   }
 
   checkValidInput(ControlType: string): boolean {
@@ -68,10 +69,16 @@ export class NewContactComponent implements OnInit {
       event.preventDefault();
       return;
     }
+
     this.errorForm = false;
     const contactData = this.saveContactData(this.contactFormGroup.value);
-    console.log('!!contactdata', contactData);
-    this.store.dispatch(updateContacts({contacts: [contactData]}))
+    if (!this.networkService.isUserOnline()) {
+      this.networkService.queueRequest({type: RequestType.addSingleContact, payload: [contactData]})
+      this.router.navigate(['/contact-list']);
+      return;
+    }
+
+    this.store.dispatch(addContacts({contacts: [contactData]}))
     // this.contacts$.subscribe(contacts => console.log('Check contacts store', contacts));
     this.router.navigate(['/contact-list'])
   }

@@ -13,7 +13,7 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.networkService.statusMessage$.subscribe(message => {
+    this.networkService.statusText$.subscribe(message => {
       this.statusMessage = message;
     })
   }

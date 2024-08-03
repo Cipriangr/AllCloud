@@ -3,8 +3,7 @@ import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { of } from 'rxjs';
 import { catchError, exhaustMap, map, mergeMap } from 'rxjs/operators';
 import { CoreService } from '../../core.service';
-import { loadContacts, loadContactsSucces, loadContactsFailure, updateContacts, uploadContactsSuccess, uploadContactsFailure } from '../actions/contacts.actions';
-import { ContactType } from '../../interfaces';
+import { loadContacts, loadContactsSucces, loadContactsFailure, addContacts, uploadContactsSuccess, uploadContactsFailure } from '../actions/contacts.actions';
 
 @Injectable()
 export class ContactsEffects {
@@ -27,9 +26,9 @@ export class ContactsEffects {
     )
   );
 
-  updateContacts$ = createEffect(() =>
+  addContacts$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(updateContacts),
+      ofType(addContacts),
       //used exhaustMap to prevent multiple updateContacts actions from being processed simultaneously. only one update at a time
       exhaustMap(action => {
         return this.coreService.addNewContact(action.contacts).pipe(

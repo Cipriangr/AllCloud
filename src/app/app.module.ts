@@ -5,7 +5,6 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { CoreService } from './core.service';
 import { HttpClientModule } from '@angular/common/http';
-import { ContactsAddedComponent } from './components/contacts-added/contacts-added.component';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { ContactListComponent } from './pages/contact-list/contact-list.component';
 import { PageNotFoundComponent } from './pages/page-not-found/page-not-found.component';
@@ -19,11 +18,12 @@ import { ContactDetailsComponent } from './pages/contact-details/contact-details
 import { ContactEditComponent } from './pages/contact-edit/contact-edit.component';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { NetworkService } from './network-worker.service';
+import { DistinctContactComponent } from './components/contacts-added/distinct-contact.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    ContactsAddedComponent,
+    DistinctContactComponent,
     NavbarComponent,
     ContactListComponent,
     PageNotFoundComponent,

@@ -35,7 +35,19 @@
       ],
       "cacheConfig": {
         "strategy": "freshness",
-        "maxSize": 10,
+        "maxSize": 50,
+        "maxAge": "1d",
+        "timeout": "10s"
+      }
+    },
+    {
+      "name": "contact-details",
+      "urls": [
+        "http://localhost:3000/users/*"
+      ],
+      "cacheConfig": {
+        "strategy": "freshness",
+        "maxSize": 50,
         "maxAge": "1d",
         "timeout": "10s"
       }
