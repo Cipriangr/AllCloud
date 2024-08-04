@@ -73,6 +73,7 @@ export class NetworkService {
     for (const request of requests) {
       try {
         await lastValueFrom(this.processRequest(request.data));
+        //TODO CHECK BUG
         //remove request FROM db after is processed:
         await this.removeRequest(request.id);
       } catch (error) {
@@ -104,7 +105,7 @@ export class NetworkService {
         );
   
       case RequestType.updateContact:
-        return this.coreService.updateContact(data.payload as ContactType).pipe(
+        return this.coreService.updateExistingContact(data.payload as ContactType).pipe(
           catchError(error => {
             console.error('Error updating contact:', error);
             return throwError(() => new Error(error))
@@ -130,31 +131,5 @@ export class NetworkService {
     const data = { type: requestData.type, payload: requestData.payload };
     await this.addRequest(data);
   }
-
-  // getContactsByNetworkState() {
-  //   if (this.isUserOnline()) {
-  //     return this.coreService.getContacts();
-  //   } else {
-  //     return this.coreService.getCachedContacts();
-  //   }
-  // }
-
-          // this.contactId = Number(params['id']); 
-        // console.log('!!mycontactid', this.contactId);
-        // this.coreService.getContacts().pipe(
-        //   // tap(contacts => {
-        //   //   console.log('!!contacts8888', contacts);
-        //   //   // this.contact = contacts/
-        //   // })
-        // ).subscribe({
-        //   next: (contacts) => {
-        //     console.log('!!contacts999', contacts);
-        //     this.coreService.getCachedContactById(this.contactId).subscribe({
-        //       next: (contact) => {
-        //         console.log('!!FINALCONTACT', contact);
-        //       }
-        //     })
-        //   }
-        // });
 
 }

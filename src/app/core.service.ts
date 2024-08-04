@@ -48,22 +48,6 @@ export class CoreService {
     contacts.forEach(contact => this.contactCache.set(contact.id, contact));
   }
 
-  // loadContactByIdWithCache(id: number): Observable<ContactType> {
-  //   console.log('!!idWAZZZ', id);
-  //   const cachedContact = this.getCachedContactById(Number(id));
-  //   if (cachedContact) {
-  //     console.log('Contact found in cache:', cachedContact);
-  //     return cachedContact;
-  //   }
-  //   console.log('Contact not found in cache, fetching from server:', id);
-  //   return this.loadContactById(id.toString()).pipe(
-  //       tap(contact => {
-  //           this.contactCache.set(contact.id, contact);
-  //           console.log('Contact fetched and cached:', contact);
-  //       })
-  //   );
-  // }
-
   getCachedContactById(id: number): Observable<ContactType> {
     const contact = this.contactCache.get(Number(id));
     if (contact) {
@@ -75,11 +59,6 @@ export class CoreService {
   loadContactById(id: string): Observable<ContactType> {
     return this.httpClient.get<ContactType>(`${this.baseServerUrl}/users/${id}`);
   }
-
-  //implemented behavioursubject for learning purposes which can be used as loadContact effect I keep ngrx to handle this for now
-  // loadContactsAsObservable(): Observable<ContactType[]> {
-  //   return this.getContacts();
-  // }
 
   addNewContact(contacts: ContactType[]): Observable<ContactType[]> {
     return this.httpClient.post<any>(`${this.baseServerUrl}/upload`, contacts, {
@@ -94,7 +73,7 @@ export class CoreService {
     )
   }
 
-  updateContact(contact: ContactType): Observable<string> {
+  updateExistingContact(contact: ContactType): Observable<string> {
     const url = `${this.baseServerUrl}/users/${contact.id}`;
     return this.httpClient.put<any>(url, contact, {
       headers: new HttpHeaders({ 'Content-Type': 'application/json' })
@@ -106,10 +85,20 @@ export class CoreService {
 
   deleteContact(id: number): Observable<number> {
     return this.httpClient.delete<number>(`${this.baseServerUrl}/users/${id}`).pipe(
+      tap(() => {
+        this.removeContactFromCache(id);
+      }),
       catchError(error => {
         return throwError(() => new Error(error.error.errorMessage));
       })
     )
+  }
+
+  removeContactFromCache(id: number): void {
+    this.contactCache.delete(id);
+    const currentContacts = this.contactsSubject.getValue();
+    const updatedContacts = currentContacts.filter(contact => contact.id !== id);
+    this.contactsSubject.next(updatedContacts);
   }
 
   deleteMessage(text: string): void {
@@ -141,6 +130,7 @@ export class CoreService {
 
   storeNewContacts(newContacts: FetchedContactType[]): void {
     const processedContacts = this.convertContacts(newContacts);
+    this.setContactsInCache([...this.contactsSubject.getValue(), ...processedContacts]);
     this.store.dispatch(addContacts({contacts: processedContacts}));
   }
 

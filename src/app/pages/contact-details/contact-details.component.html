@@ -3,7 +3,6 @@
     <img [src]="displayImage(contact)" alt="Contact Image">
   </div>
   <div class="action-buttons">
-    <!-- <a [routerLink]="['/contact-detail', contact.id, 'edit']">Edit Contact</a> -->
     <button (click)="navigateToEdit(contact.id)">Edit Contact</button>
     <button (click)="deleteContact(contact.id)">Delete Contact</button>
   </div>

@@ -18,7 +18,7 @@ import { ContactDetailsComponent } from './pages/contact-details/contact-details
 import { ContactEditComponent } from './pages/contact-edit/contact-edit.component';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { NetworkService } from './network-worker.service';
-import { DistinctContactComponent } from './components/contacts-added/distinct-contact.component';
+import { DistinctContactComponent } from './components/distinct-contact/distinct-contact.component';
 
 @NgModule({
   declarations: [

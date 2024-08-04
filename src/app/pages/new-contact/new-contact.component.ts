@@ -35,7 +35,6 @@ export class NewContactComponent implements OnInit {
       image: [null],
       gender: ['Male']
     });
-    // this.store.dispatch(loadContacts());
   }
 
   checkValidInput(ControlType: string): boolean {
@@ -79,7 +78,6 @@ export class NewContactComponent implements OnInit {
     }
 
     this.store.dispatch(addContacts({contacts: [contactData]}))
-    // this.contacts$.subscribe(contacts => console.log('Check contacts store', contacts));
     this.router.navigate(['/contact-list'])
   }
 }

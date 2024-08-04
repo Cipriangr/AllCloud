@@ -53,7 +53,50 @@ export class ContactListComponent implements OnInit, OnDestroy {
     this.subscriptions.add(loadContactsSub);
   }
   
+  showDeleteMessage(): boolean {
+    return !!this.deletedMessage && this.isDeletedTriggered;
+  }
 
+  showEditMessage(): boolean {
+    return !!this.editedMessage && this.isEditedTriggered;
+  }
+
+  handleMessages(): void {
+    this.handleSuccessMessages();
+    this.handleErrorMessages();
+    this.handleDeletedContactMessage();
+    this.handleEditedContactMessage();
+  }
+
+  addRandomContacts(): void {
+    if (!this.network.isUserOnline()) {
+      this.handleOfflineAddContact();
+      return;
+    }
+
+    this.isButtonDisabled = true;
+    const newContactsSub = this.coreService.getNewContactData(10).pipe(
+      concatMap(newContacts => {
+        this.coreService.storeNewContacts(newContacts);
+        // Disable the button for 5 seconds after being pressed
+        return timer(5000);
+      }),
+      finalize(() => {
+        this.isButtonDisabled = false;
+      })
+    ).subscribe();
+    this.subscriptions.add(newContactsSub);
+  }
+
+  handleOfflineAddContact(): void {
+    this.network.queueRequest({ type: RequestType.addMultipleContacts, payload: 10 });
+    this.isButtonDisabled = true;
+    timer(5000).subscribe(() => {
+      this.isButtonDisabled = false;
+    });
+  }
+
+  
   handleDeletedContactMessage(): void {
     const deleteObs = this.coreService.deleteObservable$.subscribe({
       next:((response) => {
@@ -89,98 +132,47 @@ export class ContactListComponent implements OnInit, OnDestroy {
     this.subscriptions.add(editObs);
   }
 
-  showDeleteMessage(): boolean {
-    return !!this.deletedMessage && this.isDeletedTriggered;
-  }
-
-  showEditMessage(): boolean {
-    return !!this.editedMessage && this.isEditedTriggered;
-  }
-
   handleSuccessMessages(): void {
-    const successObS = this.subscriptions.add(
-      this.succesUploadContact$.pipe(
-        switchMap(message => {
-          if (message) {
-            return timer(this.messageTimer).pipe(
-              switchMap(() => {
-                this.store.dispatch(clearSuccessMessage());
-                return of(null); // Complete the observable
-              })
-            );
-          }
-          return of(null); // No message, so complete immediately
-        }),
-        takeUntil(this.destroy$)
-      ).subscribe()
-    );
-    this.subscriptions.add(successObS);
+    this.succesUploadContact$.pipe(
+      switchMap(message => {
+        if (message) {
+          return timer(this.messageTimer).pipe(
+            switchMap(() => {
+              this.store.dispatch(clearSuccessMessage());
+              return of(null); // Complete the observable
+            })
+          );
+        }
+        return of(null); // No message, so complete immediately
+      }),
+      takeUntil(this.destroy$)
+    ).subscribe()
   }
 
   handleErrorMessages(): void {
-    const errorSub = this.subscriptions.add(
-      this.failedUploadContact$.pipe(
-        switchMap(message => {
-          if (message) {
-            return timer(this.messageTimer).pipe(
-              switchMap(() => {
-                this.store.dispatch(clearErrorMessage());
-                return of(null);
-              })
-            );
-          }
-          return of(null);
-        }),
-        takeUntil(this.destroy$)
-      ).subscribe()
-    );
-    this.subscriptions.add(errorSub);
-  }
-
-  handleMessages(): void {
-    this.handleSuccessMessages();
-    this.handleErrorMessages();
-    this.handleDeletedContactMessage();
-    this.handleEditedContactMessage();
-  }
-
-  addRandomContacts(): void {
-    if (!this.network.isUserOnline()) {
-      this.handleOfflineAddContact();
-      return;
-    }
-
-    this.isButtonDisabled = true;
-    //TODO edit to 10 records
-    const newContactsSub = this.coreService.getNewContactData(5).pipe(
-      concatMap(newContacts => {
-        this.coreService.storeNewContacts(newContacts);
-        // Disable the button for 5 seconds after being pressed
-        return timer(5000);
+    this.failedUploadContact$.pipe(
+      switchMap(message => {
+        if (message) {
+          return timer(this.messageTimer).pipe(
+            switchMap(() => {
+              this.store.dispatch(clearErrorMessage());
+              return of(null);
+            })
+          );
+        }
+        return of(null);
       }),
-      finalize(() => {
-        this.isButtonDisabled = false;
-      })
-    ).subscribe();
-    this.subscriptions.add(newContactsSub);
-  }
-
-  handleOfflineAddContact(): void {
-    //todo
-    // this.network.updateMessageStatus(StatusMessage.offline);
-    this.network.queueRequest({ type: RequestType.addMultipleContacts, payload: 1 });
-    this.isButtonDisabled = true;
-    timer(5000).subscribe(() => {
-      this.isButtonDisabled = false;
-    });
+      takeUntil(this.destroy$)
+    ).subscribe()
   }
 
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
-    //clean the texts if user switches navigates to another page and back to contact-list faster than tthis.timer so it won't see the message
     this.coreService.resetMessages();
     this.subscriptions.unsubscribe();
+    this.store.dispatch(clearSuccessMessage());
+    this.store.dispatch(clearErrorMessage());
   }
 
 }

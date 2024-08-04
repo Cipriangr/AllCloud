@@ -24,9 +24,8 @@ export class ContactEditComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.getContactData();
     this.initializeForm();
-    // this.getContactsFromDB();
+    this.getContactData();
   }
 
   initializeForm(): void {
@@ -36,30 +35,38 @@ export class ContactEditComponent implements OnInit, OnDestroy {
       email: ['', [Validators.required, Validators.email]],
       phone: ['', [Validators.required, Validators.pattern(/^[0-9]{10}$/)]],
       age: ['', [Validators.required, Validators.pattern(/^[1-9][0-9]{0,1}$/)]],
-      gender: ['Male']
+      gender: ['']
     });
   }
 
-  getContactData(): void {
-    const routeSubscription = this.activatedRoute.params.pipe(
-      tap(params => {
-        this.contactId = Number(params['id']);
-      }),
-      switchMap(() => this.coreService.fetchAndCacheContactById(this.contactId)),
-      tap(contact => {
-        this.contact = contact;
-        this.contactFormGroup.patchValue(contact);
-        this.contactError = false;
-      }),
-      catchError(error => {
-        this.contactError = true;
-        console.error('Error fetching contact data:', error);
-        return of(null);
-      })
-    ).subscribe();
-  
-    this.subscriptions.add(routeSubscription);
-  }
+getContactData(): void {
+  const routeSubscription = this.activatedRoute.params.pipe(
+    tap(params => {
+      this.contactId = Number(params['id']);
+    }),
+    switchMap(() => this.coreService.fetchAndCacheContactById(this.contactId)),
+    tap(contact => {
+      this.contact = contact;
+      const genderNormalized = contact.gender.charAt(0).toUpperCase() + contact.gender.slice(1).toLowerCase();
+      this.contactFormGroup.patchValue({
+        firstName: contact.firstName,
+        lastName: contact.lastName,
+        email: contact.email,
+        phone: contact.phone,
+        age: contact.age,
+        gender: genderNormalized
+      });
+      this.contactError = false;
+    }),
+    catchError(error => {
+      this.contactError = true;
+      console.error('Error fetching contact data:', error);
+      return of(null);
+    })
+  ).subscribe();
+
+  this.subscriptions.add(routeSubscription);
+}
   
   onSubmit(): void {
     if (this.contactFormGroup.valid) {
@@ -70,7 +77,7 @@ export class ContactEditComponent implements OnInit, OnDestroy {
         return;
       }
       //update contact and create messages to be displayed on homepage(contact-list)
-      const updateContactSub = this.coreService.updateContact(updatedContact).subscribe({
+      const updateContactSub = this.coreService.updateExistingContact(updatedContact).subscribe({
         next: () => {
           this.coreService.contactEditMessage('Contact Edited Succesfully');
           this.router.navigate(['/contact-list']);

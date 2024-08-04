@@ -47,23 +47,6 @@ export class ContactDetailsComponent implements OnInit, OnDestroy {
     this.subscriptions.add(routeSubscription);
   }
   
-  
-  //get ContactId so I can use it to display the contact informations
-  // getContactId() {
-  //   const contactId = this.activatedRoute.params.subscribe(params => {
-  //     const id = params['id'];
-  //   console.log('!!idPARAM', id);
-  //     const contactData = this.coreService.loadContactByIdWithCache(id).subscribe({
-  //       next: contact => {
-  //         console.log('!!contactComp', contact);
-  //         this.contact = contact;
-  //       }
-  //     })
-  //     this.subscriptions.add(contactData);
-  //   })
-  //   this.subscriptions.add(contactId);
-  // }
-
   navigateToEdit(id: number) {
     this.route.navigate(['/contact-details', id, 'edit']);
   }

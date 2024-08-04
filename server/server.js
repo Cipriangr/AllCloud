@@ -98,7 +98,7 @@ router.post('/upload', (req, res) => {
         } else {
             // Respond with a success message
             console.log('Contact is saved');
-            res.status(200).send({ message: 'Contacts saved successfully' });
+            res.status(200).send({ message: `Contact ${values[1]} ${values[2]}` });
         }
     });
 });
