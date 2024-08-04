@@ -14,7 +14,8 @@ const db = new sqlite3.Database('./database.db', (err) => {
 });
 
 app.use(express.json());
-app.use(cors({ origin: 'http://localhost:4200' }));
+//In order to work on both dev and production
+app.use(cors({ origin: ['http://localhost:4200', 'http://localhost:8080'] }));
 
 const router = express.Router();
 
@@ -80,11 +81,15 @@ router.post('/upload', (req, res) => {
 
             if (err.message.includes('UNIQUE constraint failed')) {
                 if (err.message.includes('users.email')) {
-                    errorMessage = 'Email is already used. Edit existing contact';
+                    const emailIndex = 3;
+                    const conflictingEmail = values[emailIndex];
+                    errorMessage = `Email ${conflictingEmail} is already used. Edit existing contact`;
                 } else if (err.message.includes('users.id')) {
-                    errorMessage = 'An id for a contact generated is already used. Please try again';
+                    errorMessage = `An ID for a contact generated is already used. Please try again`;
                 } else if (err.message.includes('users.phone')) {
-                    errorMessage = 'Phone number is already used. Edit existing contact';
+                    const phoneIndex = 4;
+                    const conflictingPhone = values[phoneIndex];
+                    errorMessage = `Phone number ${conflictingPhone} is already used. Edit existing contact`;
                 }
             }
 

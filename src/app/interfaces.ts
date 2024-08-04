@@ -1,3 +1,5 @@
+import { DBSchema } from 'idb';
+
 export interface ContactType {
   id: number;
   lastName: string;
@@ -97,4 +99,28 @@ export interface ContactFormData {
 
 export interface ErrorResponse {
   error: string;
+}
+
+export enum StatusMessage {
+  online = 'Connection restored! Your pending requests are now being processed.',
+  offline = 'You are offline. Your requests will be processed when you will be back online.'
+}
+
+export interface RequestSchema extends DBSchema {
+  requests: {
+    key: number;
+    value: RequestPayload;
+  };
+}
+
+export interface RequestPayload {
+  type: RequestType;
+  payload: ContactType | ContactType[] | number | string;
+}
+
+export enum RequestType {
+  addMultipleContacts = 'addContacts',
+  deleteContact = 'deleteContact',
+  addSingleContact = 'addContact',
+  updateContact = 'updateContact'
 }

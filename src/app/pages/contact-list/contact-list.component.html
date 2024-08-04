@@ -20,5 +20,11 @@
   <div class="custom-message" *ngIf="showEditMessage()">
     <h2>{{ editedMessage }}</h2>
   </div>
-  <app-users-list></app-users-list>
+  
+  <ng-container *ngIf="contactList$ | async as contactList; else noContacts">
+    <app-distinct-contact *ngFor="let contact of contactList" [contact]="contact"></app-distinct-contact>
+  </ng-container>
+  <ng-template #noContacts>
+    <p class="nocontacts">No contacts added. Press the button 'Add Random Records' above</p>
+  </ng-template>
 </div>

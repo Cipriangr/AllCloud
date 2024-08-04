@@ -9,7 +9,7 @@ export const loadContactsFailure = createAction('[Contacts] Load Contacts Failur
   props<{ error: any }>()
 );
 
-export const updateContacts = createAction('[Contacts] Update Contacts',
+export const addContacts = createAction('[Contacts] add Contacts',
   props<{contacts: ContactType[]}> ()
 );
 

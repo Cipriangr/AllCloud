@@ -3,9 +3,8 @@ import { BrowserModule } from '@angular/platform-browser';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { BackendService } from './core.service';
+import { CoreService } from './core.service';
 import { HttpClientModule } from '@angular/common/http';
-import { UsersListComponent } from './components/users-list/users-list.component';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { ContactListComponent } from './pages/contact-list/contact-list.component';
 import { PageNotFoundComponent } from './pages/page-not-found/page-not-found.component';
@@ -18,11 +17,13 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { ContactDetailsComponent } from './pages/contact-details/contact-details.component';
 import { ContactEditComponent } from './pages/contact-edit/contact-edit.component';
 import { ServiceWorkerModule } from '@angular/service-worker';
+import { NetworkService } from './network-worker.service';
+import { DistinctContactComponent } from './components/contacts-added/distinct-contact.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    UsersListComponent,
+    DistinctContactComponent,
     NavbarComponent,
     ContactListComponent,
     PageNotFoundComponent,
@@ -45,7 +46,7 @@ import { ServiceWorkerModule } from '@angular/service-worker';
     })
   ],
   providers: [
-    BackendService,
+    CoreService, NetworkService
   ],
   bootstrap: [AppComponent]
 })

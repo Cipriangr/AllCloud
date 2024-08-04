@@ -1,9 +1,10 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Subscription } from 'rxjs';
-import { ContactType } from '../../interfaces';
-import { BackendService } from '../../core.service';
+import { catchError, Observable, of, Subscription, switchMap, tap } from 'rxjs';
+import { ContactType, RequestType } from '../../interfaces';
+import { CoreService } from '../../core.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { NetworkService } from '../../network-worker.service';
 
 @Component({
   selector: 'app-contact-edit',
@@ -15,14 +16,17 @@ export class ContactEditComponent implements OnInit, OnDestroy {
   contactError = false;
   private subscriptions = new Subscription();
   contactFormGroup!: FormGroup;
+  test: Observable<ContactType[]> = of([]);
+  contactId!: number;
 
-  constructor(private activatedRoute: ActivatedRoute, private backendService: BackendService,
-              private fb: FormBuilder, private router: Router) {
+  constructor(private activatedRoute: ActivatedRoute, private coreService: CoreService,
+              private fb: FormBuilder, private router: Router, private network: NetworkService) {
   }
 
   ngOnInit(): void {
     this.getContactData();
     this.initializeForm();
+    // this.getContactsFromDB();
   }
 
   initializeForm(): void {
@@ -37,42 +41,42 @@ export class ContactEditComponent implements OnInit, OnDestroy {
   }
 
   getContactData(): void {
-    const routeSubscription = this.activatedRoute.params.subscribe({
-      next: (data) => {
-        const contactSubscription = this.backendService.loadContactById(data['id']).subscribe({
-          next: contact => {
-            this.contactFormGroup.patchValue(contact);
-            this.contact = contact;
-            this.contactError = false;
-            console.log('Contactdata', this.contact);
-          },
-          error: () => {
-            this.contactError = true;
-          }
-        });
+    const routeSubscription = this.activatedRoute.params.pipe(
+      tap(params => {
+        this.contactId = Number(params['id']);
+      }),
+      switchMap(() => this.coreService.fetchAndCacheContactById(this.contactId)),
+      tap(contact => {
+        this.contact = contact;
+        this.contactFormGroup.patchValue(contact);
         this.contactError = false;
-        this.subscriptions.add(contactSubscription);
-      },
-      error: () => {
+      }),
+      catchError(error => {
         this.contactError = true;
-      }
-    });
+        console.error('Error fetching contact data:', error);
+        return of(null);
+      })
+    ).subscribe();
+  
     this.subscriptions.add(routeSubscription);
   }
-
+  
   onSubmit(): void {
     if (this.contactFormGroup.valid) {
-      console.log('!!this.contactofmr', this.contactFormGroup)
       const updatedContact = { ...this.contact, ...this.contactFormGroup.value };
-      console.log('Updated contact data:', updatedContact);
+      if (!this.network.isUserOnline()) {
+        this.network.queueRequest({type: RequestType.updateContact, payload: updatedContact})
+        this.router.navigate(['/contact-list']);
+        return;
+      }
       //update contact and create messages to be displayed on homepage(contact-list)
-      const updateContactSub = this.backendService.updateContact(updatedContact).subscribe({
+      const updateContactSub = this.coreService.updateContact(updatedContact).subscribe({
         next: () => {
-          this.backendService.contactEditMessage('Contact Edited Succesfully');
+          this.coreService.contactEditMessage('Contact Edited Succesfully');
           this.router.navigate(['/contact-list']);
         },
         error: () => {
-          this.backendService.contactEditMessage('Contact edit error');
+          this.coreService.contactEditMessage('Contact edit error');
           console.error('Error updating contact');
         }
       });
@@ -84,6 +88,14 @@ export class ContactEditComponent implements OnInit, OnDestroy {
     const control = this.contactFormGroup.get(ControlType);
     return control?.valid ?? false;
   }
+
+  displayImage(contact: ContactType): string {
+    if (!contact.large || !this.network.isUserOnline()) {
+      return "/assets/noimage.webp";
+    }
+    return contact.large;
+  }
+
   
   ngOnDestroy(): void {
     this.subscriptions.unsubscribe();
