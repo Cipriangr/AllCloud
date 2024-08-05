@@ -103,7 +103,7 @@ export interface ErrorResponse {
 
 export enum StatusMessage {
   online = 'Connection restored! Your pending requests are now being processed.',
-  offline = 'You are offline. Your requests will be processed when you will be back online.'
+  offline = 'You are offline. Your future requests will be processed when you will be back online.'
 }
 
 export interface RequestSchema extends DBSchema {

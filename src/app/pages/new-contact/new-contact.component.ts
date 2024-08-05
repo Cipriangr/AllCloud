@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { select, Store } from '@ngrx/store';
-import { addContacts, loadContacts } from '../../store/actions/contacts.actions';
+import { addContacts } from '../../store/actions/contacts.actions';
 import { ContactFormData, ContactsState, ContactType, RequestType } from '../../interfaces';
 import { CoreService } from '../../core.service';
 import { selectAllContacts } from '../../store/selectors/contacts.selectors';

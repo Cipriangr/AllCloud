@@ -21,7 +21,7 @@
     <h2>{{ editedMessage }}</h2>
   </div>
   
-  <ng-container *ngIf="contactList$ | async as contactList; else noContacts">
+  <ng-container *ngIf="contactList && contactList.length > 0; else noContacts">
     <app-distinct-contact *ngFor="let contact of contactList" [contact]="contact"></app-distinct-contact>
   </ng-container>
   <ng-template #noContacts>

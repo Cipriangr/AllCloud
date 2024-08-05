@@ -1,7 +1,7 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { ContactType, ApiResponseType, FetchedContactType, RequestType, RequestPayload } from './interfaces';
-import { BehaviorSubject, catchError, EMPTY, map, Observable, of, Subject, switchMap, tap, throwError } from 'rxjs';
+import { ContactType, ApiResponseType, FetchedContactType } from './interfaces';
+import { BehaviorSubject, catchError, EMPTY, map, Observable, of, switchMap, tap, throwError } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { addContacts } from './store/actions/contacts.actions';
 
@@ -67,6 +67,9 @@ export class CoreService {
       map(response => {
         return response.message;
       }),
+      tap(() => {        
+        this.setContactsInCache([...this.contactsSubject.getValue(), ...contacts]);
+      }),
       catchError(error => {
         return throwError(() => new Error(error.error.errorMessage))
       })
@@ -78,7 +81,10 @@ export class CoreService {
     return this.httpClient.put<any>(url, contact, {
       headers: new HttpHeaders({ 'Content-Type': 'application/json' })
     }).pipe(
-      map(response => response.message), 
+      map(response => response.message),
+      tap(() => {
+        this.editContactFromCache(contact);
+      }),
       catchError(error => throwError(() => new Error(error.error.errorMessage || 'Unknown error')))
     );
   }
@@ -99,6 +105,12 @@ export class CoreService {
     const currentContacts = this.contactsSubject.getValue();
     const updatedContacts = currentContacts.filter(contact => contact.id !== id);
     this.contactsSubject.next(updatedContacts);
+  }
+
+  editContactFromCache(editedContact: ContactType): void {
+    const contacts = this.contactsSubject.getValue();
+    const updatedContacts = contacts.map(oldContact => oldContact.id === editedContact.id ? editedContact: oldContact)
+    this.setContactsInCache(updatedContacts);
   }
 
   deleteMessage(text: string): void {

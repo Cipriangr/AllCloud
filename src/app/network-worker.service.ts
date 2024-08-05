@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { ContactType, RequestPayload, RequestSchema, RequestType, StatusMessage } from "./interfaces";
-import { BehaviorSubject, catchError, concatMap, lastValueFrom, map, Observable, of, throwError } from "rxjs";
-import { openDB, DBSchema, IDBPDatabase, IDBPTransaction } from 'idb';
+import { BehaviorSubject, catchError, concatMap, lastValueFrom, Observable, throwError } from "rxjs";
+import { openDB, IDBPDatabase } from 'idb';
 import { CoreService } from "./core.service";
 
 @Injectable({
@@ -35,6 +35,10 @@ export class NetworkService {
     this.statusMessageSubject.next(message);
   }
 
+  resetMessageStatus(): void {
+    this.statusMessageSubject.next('');
+  }
+
   handleOnline() {
     this.updateMessageStatus(StatusMessage.online);
     this.syncRequests();
@@ -54,34 +58,33 @@ export class NetworkService {
   async getAllRequests(): Promise<{ id: number; data: RequestPayload }[]> {
     const tx = this.indexDb.transaction('requests', 'readonly');
     const requests = await tx.store.getAll();
+    const keys = await tx.store.getAllKeys();
     await tx.done;
     
     return requests.map((request, index) => ({
-      id: index, // to get id from individual request
+      id: keys[index] as number,
       data: request
     }));
   }
 
-  async removeRequest(id: number) {
+  async removeRequest(id: number): Promise<void> {
     const tx = this.indexDb.transaction('requests', 'readwrite');
     await tx.store.delete(id);
     await tx.done;
   }
-
-  async syncRequests() {
+  
+  async syncRequests(): Promise<void> {
     const requests = await this.getAllRequests();
     for (const request of requests) {
       try {
         await lastValueFrom(this.processRequest(request.data));
-        //TODO CHECK BUG
-        //remove request FROM db after is processed:
         await this.removeRequest(request.id);
       } catch (error) {
         console.error("Error processing request:", error);
       }
     }
   }
-
+  
   processRequest(data: RequestPayload): Observable<any> {
     switch (data.type) {
       case RequestType.addMultipleContacts:

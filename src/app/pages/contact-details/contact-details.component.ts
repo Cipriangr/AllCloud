@@ -23,8 +23,6 @@ export class ContactDetailsComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.getContactData();
-    // this.coreService.contacts$.subscribe(
-    // )
   }
 
   getContactData(): void {

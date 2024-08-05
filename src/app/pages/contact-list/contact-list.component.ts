@@ -1,9 +1,9 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CoreService } from '../../core.service';
-import { ContactType, RequestType, StatusMessage } from '../../interfaces';
+import { ContactType, RequestType } from '../../interfaces';
 import { select, Store } from '@ngrx/store';
 import { clearErrorMessage, clearSuccessMessage } from '../../store/actions/contacts.actions';
-import { catchError, concatMap, finalize, Observable, of, Subject, Subscription, switchMap, takeUntil, tap, timer } from 'rxjs';
+import { catchError, concatMap, finalize, Observable, of, Subject, Subscription, switchMap, takeUntil, timer } from 'rxjs';
 import { selectUpdateContactsError, selectUpdateContactsSuccess } from '../../store/selectors/contacts.selectors';
 import { NetworkService } from '../../network-worker.service';
 
@@ -14,7 +14,7 @@ import { NetworkService } from '../../network-worker.service';
 })
 export class ContactListComponent implements OnInit, OnDestroy {
 
-  contactList$: Observable<ContactType[]> = of([]);
+  contactList!: ContactType[];
   succesUploadContact$!: Observable<string | null>;
   failedUploadContact$!: Observable<string | null>;
   subscriptions = new Subscription();
@@ -39,17 +39,13 @@ export class ContactListComponent implements OnInit, OnDestroy {
   getContactsFromDB(): void {
     const loadContactsSub = this.coreService.getContacts().pipe(
       switchMap(() => this.coreService.contactsObservable$),
-      tap(contacts => {
-        if (contacts && contacts.length > 0) {
-          this.contactList$ = of(contacts);
-        }
-      }),
       catchError(err => {
-        console.error('Error fetching contacts from DB:', err);
-        this.contactList$ = of([]);
+        //Todo HANDLE ERROR
         return of([]);
       })
-    ).subscribe();
+    ).subscribe(contacts => {
+      this.contactList = contacts;
+    });
     this.subscriptions.add(loadContactsSub);
   }
   
@@ -103,7 +99,7 @@ export class ContactListComponent implements OnInit, OnDestroy {
         if (response) {
           this.deletedMessage = response;
           this.isDeletedTriggered = true;
-          //easier way to make message dissapear from template after 4 seconds instead of NRGX way
+          //alternative way to make message dissapear from template after 4 seconds instead of NRGX way
           timer(this.messageTimer).subscribe(() => {
             this.deletedMessage = '';
             this.isDeletedTriggered = false;
