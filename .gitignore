@@ -43,3 +43,4 @@ Thumbs.db
 
 # Database files
 server/database.db
+server/node_modules
