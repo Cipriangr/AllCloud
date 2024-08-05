@@ -4,7 +4,7 @@
             <img [src]="displayImage(contact)" alt="">
         </div>
         <div class="info">
-            <h4 class="name">{{ contact.title }}. {{ contact.firstName }} {{ contact.lastName }}</h4>
+            <h4 class="name small-ellipsis">{{ contact.title }}. {{ contact.firstName }} {{ contact.lastName }}</h4>
             <div class="email common-info">
                 <a href="mailto: {{contact.email}}" class="small-ellipsis">
                     {{ contact.email }}

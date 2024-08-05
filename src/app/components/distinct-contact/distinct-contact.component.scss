@@ -39,6 +39,7 @@
       width: 60%;
       overflow: hidden;
       .small-ellipsis {
+        max-width: -webkit-fill-available;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;

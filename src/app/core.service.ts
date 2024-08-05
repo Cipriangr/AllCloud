@@ -45,6 +45,7 @@ export class CoreService {
 
   setContactsInCache(contacts: ContactType[]): void {
     this.contactsSubject.next(contacts);
+    console.log('!!contactscach', contacts);
     contacts.forEach(contact => this.contactCache.set(contact.id, contact));
   }
 
@@ -142,7 +143,8 @@ export class CoreService {
 
   storeNewContacts(newContacts: FetchedContactType[]): void {
     const processedContacts = this.convertContacts(newContacts);
-    this.setContactsInCache([...this.contactsSubject.getValue(), ...processedContacts]);
+    console.log('!!processed', processedContacts);
+    // this.setContactsInCache([...this.contactsSubject.getValue(), ...processedContacts]);
     this.store.dispatch(addContacts({contacts: processedContacts}));
   }
 
