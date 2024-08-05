@@ -22,6 +22,7 @@ This project was generated with [Angular CLI](https://github.com/angular/angular
 
 Run `ng serve` on main folder. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
 
-## Contact
+## Contact & Info
 
-Feel free to contact me on cipriangrumazescu97@gmail.com for questions.
+- For learning and practice purposes, I started by implementing Nrgx as state managment. Meantime, I realised it's way easier with RXJS and I removed Ngrx in some part of the code but I kept it in some places.
+- Feel free to contact me on cipriangrumazescu97@gmail.com for questions.

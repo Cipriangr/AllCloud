@@ -73,7 +73,6 @@ export class ContactListComponent implements OnInit, OnDestroy {
     this.isButtonDisabled = true;
     const newContactsSub = this.coreService.getNewContactData(1).pipe(
       concatMap(newContacts => {
-        console.log('!!newcontacts', newContacts);
         this.coreService.storeNewContacts(newContacts);
         // Disable the button for 5 seconds after being pressed
         return timer(5000);
