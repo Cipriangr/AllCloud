@@ -2,26 +2,22 @@
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 18.0.4.
 
-## Development server
+## Install project locally
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+1. On your "AllCloud" folder open terminal and Run `git init` following by `git pull https://github.com/Cipriangr/AllCloud.git`
+2. On main folder, Run `npm install`.
+3. Go to /server folder and run `npm install` and `node database.js` to initialize the database
 
-## Code scaffolding
+## Starting the project with Service Worker (Online and Offline mode)
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+-Go to server folder and start the server by running in terminal `node server.js`. Wait for "Connected to the database" message in terminal. It will run on port 3000, go to `http://localhost:3000/users` to check everything is fine (it should be an empty array if you didn't add any contacts yet). Close this terminal only when you want to close the server.
+-Open another terminal, go to main folder and run `ng build`. Wait the build to finish and check if dist folder was created. Run `npx http-server -p 8080 -c-1 dist/all-cloud/browser` or change the path if is different. You might notice message: `Need to install the following packages: http-server@14.1.1`. Type `y` and wait to be installed. When text `Starting up http-server, serving dist/all-cloud/browser...` is displayed, the project is online and can be tested on `http://localhost:8080/`.
+-I recommend to use incognito. Add some contacts by pressing "Add Random Records" and hit refresh button one or 2 times so the data is cached.
+-Right click and go to Inspect -> Application -> Service Workers (Above Storage category) and check if service worker `http://localhost:8080` is registered.
+-Features: Add 10 contacts, Details about specific contacts, edit contact, delete contact and add New Contact are available.
+-Simulate offline mode by checking Offline checkbox in Application - Service Worker or Network - Pressets Offline.
+-Offline requests should be added and removed (when back online) in IndexedDB-RequestQueue-requests
 
-## Build
+## Starting the project online mode only
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
-
-## Running unit tests
-
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
-
-## Running end-to-end tests
-
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
-
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+Run `ng serve` on main folder. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
