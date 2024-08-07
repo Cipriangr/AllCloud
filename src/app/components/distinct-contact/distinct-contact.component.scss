@@ -87,7 +87,7 @@
         overflow: hidden;
         margin: 0;
         white-space: nowrap;
-
+        max-width: -webkit-fill-available;
         @media (width <=400px) {
           font-size: 16px;
         }
