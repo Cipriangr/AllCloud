@@ -77,6 +77,7 @@ export class NetworkService {
     const requests = await this.getAllRequests();
     for (const request of requests) {
       try {
+        //converts observable to promise to match this method
         await lastValueFrom(this.processRequest(request.data));
         await this.removeRequest(request.id);
       } catch (error) {

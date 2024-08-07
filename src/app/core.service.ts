@@ -1,7 +1,7 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { ContactType, ApiResponseType, FetchedContactType } from './interfaces';
-import { BehaviorSubject, catchError, EMPTY, map, Observable, of, switchMap, tap, throwError } from 'rxjs';
+import { BehaviorSubject, catchError, concatMap, EMPTY, map, Observable, of, switchMap, tap, throwError } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { addContacts } from './store/actions/contacts.actions';
 
@@ -35,7 +35,7 @@ export class CoreService {
 
   fetchAndCacheContactById(contactId: number): Observable<ContactType> {
     return this.getContacts().pipe(
-      switchMap(() => this.getCachedContactById(contactId)),
+      concatMap(() => this.getCachedContactById(contactId)),
       catchError(error => {
         console.error('Error in fetchAndCacheContactById:', error);
         return of();
