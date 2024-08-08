@@ -20,18 +20,13 @@ export class AppComponent implements OnInit {
   }
 
   handleStatusMessage(): void {
-    const statusSub = this.networkService.statusText$.subscribe({
+    this.subscriptions.add(this.networkService.statusText$.subscribe({
       next:((message) => {
+        console.log('!!message', message);
         this.statusMessage = message;
-        this.timerSubscription = timer(7000).subscribe(() => {
-          this.statusMessage = '';
-          this.networkService.resetMessageStatus();
-        })
-        this.subscriptions.add(this.timerSubscription);
       })
     })
-    this.subscriptions.add(statusSub);
-  }
+  )}
 
   ngOnDestroy(): void {
     this.subscriptions.unsubscribe();
