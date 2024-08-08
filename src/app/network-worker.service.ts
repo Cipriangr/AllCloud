@@ -38,7 +38,7 @@ export class NetworkService {
 
   resetMessageStatus(): void {
     this.statusText$.pipe(
-      switchMap(() => timer(5000)),
+      switchMap(() => timer(3000)),
       tap(() => this.statusMessageSubject.next(''))
     ).subscribe();
   }

@@ -9,7 +9,6 @@ import { Subscription, timer } from 'rxjs';
 })
 export class AppComponent implements OnInit {
   statusMessage: string = '';
-  timerSubscription!: Subscription;
   subscriptions = new Subscription();
 
   constructor(private networkService: NetworkService) { 
