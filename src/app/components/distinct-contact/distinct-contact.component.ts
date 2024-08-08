@@ -1,4 +1,4 @@
-import { Component, Input, } from '@angular/core';
+import { AfterContentInit, AfterViewInit, Component, ContentChild, ElementRef, Input, } from '@angular/core';
 import { ContactType } from '../../interfaces';
 
 @Component({
@@ -6,10 +6,15 @@ import { ContactType } from '../../interfaces';
   templateUrl: './distinct-contact.component.html',
   styleUrl: './distinct-contact.component.scss',
 })
-export class DistinctContactComponent {
+export class DistinctContactComponent implements AfterContentInit {
   @Input() contact!: ContactType;
+  @ContentChild("age") ageProjected!: ElementRef;
 
   constructor() {
+  }
+
+  ngAfterContentInit(): void {
+    this.ageProjected.nativeElement.setAttribute('style','color: blue');
   }
 
   displayImage(contact: ContactType): string {

@@ -22,7 +22,9 @@
   </div>
   
   <ng-container *ngIf="contactList && contactList.length > 0; else noContacts">
-    <app-distinct-contact *ngFor="let contact of contactList" [contact]="contact"></app-distinct-contact>
+    <app-distinct-contact *ngFor="let contact of contactList" [contact]="contact" #test>
+      <span #age>Age: {{contact.age}}</span>
+    </app-distinct-contact>
   </ng-container>
   <ng-template #noContacts>
     <p class="nocontacts">No contacts added. Press the button 'Add Random Records' above</p>

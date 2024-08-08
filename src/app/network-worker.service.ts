@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 import { ContactType, RequestPayload, RequestSchema, RequestType, StatusMessage } from "./interfaces";
-import { BehaviorSubject, catchError, concatMap, lastValueFrom, Observable, throwError } from "rxjs";
+import { BehaviorSubject, catchError, concatMap, lastValueFrom, Observable, switchMap, tap, throwError, timer } from "rxjs";
 import { openDB, IDBPDatabase } from 'idb';
 import { CoreService } from "./core.service";
 
@@ -33,10 +33,14 @@ export class NetworkService {
 
   updateMessageStatus(message: string): void {
     this.statusMessageSubject.next(message);
+    this.resetMessageStatus();
   }
 
   resetMessageStatus(): void {
-    this.statusMessageSubject.next('');
+    this.statusText$.pipe(
+      switchMap(() => timer(5000)),
+      tap(() => this.statusMessageSubject.next(''))
+    ).subscribe();
   }
 
   handleOnline() {
