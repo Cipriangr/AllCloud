@@ -38,7 +38,7 @@ export class ContactListComponent implements OnInit, OnDestroy {
 
   getContactsFromDB(): void {
     const loadContactsSub = this.coreService.getContacts().pipe(
-      switchMap(() => this.coreService.contactsObservable$),
+      concatMap(() => this.coreService.contactsObservable$),
       catchError(err => {
         //Todo HANDLE ERROR
         return of([]);
