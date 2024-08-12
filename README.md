@@ -4,7 +4,7 @@ This project was generated with [Angular CLI](https://github.com/angular/angular
 
 ## Install project locally
 
-1. On your "AllCloud" folder open terminal and Run `git init` following by `git pull https://github.com/Cipriangr/AllCloud.git`
+1. On your project folder open terminal and Run `git init` following by `git pull https://github.com/Cipriangr/AllCloud.git`
 2. On main folder, Run `npm install`.
 3. Go to /server folder and run `npm install` and `node database.js` to initialize the database
 
